@@ -231,21 +231,9 @@ observeEvent(input$Epicurve_download,{
     )
     
   } else {
-    showModal(
-      modalDialog(
-        fluidRow(
-          column(
-            width = 12,
-            align = "center",
-            h3('没找到数据, 请点击“数据预览”按钮并出现流行曲线后再试~')
-          )
-        ),
-        title = "ERROR",
-        size = "s",
-        footer = list(
-          modalButton("确定")
-        )
-      )
-    )
+       shinyalert("提交失败", '没找到数据, 请点击“数据预览”按钮并出现流行曲线后再试~', 
+                  timer = 5000 , 
+                  type = "error",
+                  size = 'xs')
   }
 })

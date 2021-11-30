@@ -162,20 +162,40 @@ observeEvent(input$R0_gt_data_gt_example_1,{
 # est.R0 ------------------------------------------------------------------
 
 observeEvent(input$R0_R0_confirmed,{
-  begin <- input$R0_est_begin
-  end <- input$R0_est_end
-  datafile <- values$df_global
-  df_gt <- values$R0_gt
-  if(input$R0_est_function == 'EG') {
-    df_R0 <- est.R0.EG(datafile$X, df_gt, begin=begin, end=end)
-  }
-  if(input$R0_est_function == 'ML') {
-    df_R0 <- est.R0.ML(datafile$X, df_gt, begin=begin, end=end, range = c(0.01, 50))
-  }
-  
-  output$R0_est_R0 <- renderPrint(print(df_R0))
-
-  output$fig_R0_R0 <- renderPlot({
-    plot(df_R0)
-  })
+     begin <- input$R0_est_begin
+     end <- input$R0_est_end
+     df <- values$df_plot %>% 
+          group_by(onset) %>% 
+          summarise(X = n())
+     
+     if(is.na(begin) | is.na(end)){
+          shinyalert("提交失败", "原因：开始和(或)结束时间点缺失！", 
+                     timer = 5000 , 
+                     type = "error",
+                     size = 'xs')
+     } else {
+          if(nrow(df) >= end){
+               df_value <- df$X
+               names(df_value) <- df$onset
+               
+               df_gt <- values$R0_gt
+               if(input$R0_est_function == 'EG') {
+                    df_R0 <- est.R0.EG(df_value, df_gt, begin=begin, end=end)
+               }
+               if(input$R0_est_function == 'ML') {
+                    df_R0 <- est.R0.ML(df_value, df_gt, begin=begin, end=end, range = c(0.01, 50))
+               }
+               
+               output$R0_est_R0 <- renderPrint(print(df_R0))
+               
+               output$fig_R0_R0 <- renderPlot({
+                    plot(df_R0)
+               })
+          } else {
+               shinyalert("提交失败", "原因：结束时间点过长！", 
+                          timer = 5000 , 
+                          type = "error",
+                          size = 'xs')
+          }
+     }
 })

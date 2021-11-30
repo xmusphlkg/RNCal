@@ -78,11 +78,23 @@ observeEvent(input$EpiEstim_parametric_confirmed,{
   
   figs$fig_Rt <- fig
   values$df_Rt <- outcome
+  output$fig_EpiEstim_Rt <- renderPlot({
+       fig
+  })
 })
 
 observeEvent(input$EpiEstim_non_parametric_confirmed,{
      si_distr <- hot_to_r(input$non_parametric_si_data)
      names(si_distr) <- c('n', 'freq')
+     si_distr <- si_distr %>% 
+          complete(
+               n = seq(min(n), max(n)),
+               fill = list(freq = 0)
+          ) %>% 
+          mutate(
+               freq = freq/sum(freq)
+          )
+     
      start_date <- as.numeric(input$epiestim_non_parametric_si_first)
      space_date <- as.numeric(input$epiestim_non_parametric_si_width)
      
@@ -130,7 +142,8 @@ observeEvent(input$EpiEstim_non_parametric_confirmed,{
                expand = c(0,0),
                date_labels = "%m月%d日",
                date_breaks = date_breaks)+
-          scale_y_continuous(expand = c(0,0))+
+          scale_y_continuous(expand = expansion(mult = c(0, 0.1)),
+                             limits = c(0, NA))+
           labs(x = "", y = expression(R[t]))+
           theme_set()+
           # theme(plot.margin=unit(c(1,3,1,1),'lines'))+
@@ -209,7 +222,8 @@ observeEvent(input$EpiEstim_uncertain_si_confirmed,{
                expand = c(0,0),
                date_labels = "%m月%d日",
                date_breaks = date_breaks)+
-          scale_y_continuous(expand = c(0,0))+
+          scale_y_continuous(expand = expansion(mult = c(0, 0.1)),
+                             limits = c(0, NA))+
           labs(x = "", y = expression(R[t]))+
           theme_set()+
           # theme(plot.margin=unit(c(1,3,1,1),'lines'))+
@@ -222,24 +236,11 @@ observeEvent(input$EpiEstim_uncertain_si_confirmed,{
      })
 })
 
-
 output$non_parametric_si_data <- renderRHandsontable({
   DF <- data.frame(
     天数 = 1:12,
-    频数 = c(0, rep(0.1, 10), 0)
+    频数 = sample(1:5, size = 12, replace = T)
   )
-  rhandsontable(DF, language = 'zh-CN') %>% 
-    hot_context_menu(allowColEdit = FALSE, allowRowEdit = TRUE)
-})
-
-output$non_si_from_sample_data <- renderRHandsontable({
-  DF <- MockRotavirus$si_data
-  rhandsontable(DF, language = 'zh-CN') %>% 
-    hot_context_menu(allowColEdit = FALSE, allowRowEdit = TRUE)
-})
-
-output$non_si_from_data_data <- renderRHandsontable({
-  DF <- MockRotavirus$si_data
   rhandsontable(DF, language = 'zh-CN') %>% 
     hot_context_menu(allowColEdit = FALSE, allowRowEdit = TRUE)
 })
@@ -469,7 +470,8 @@ observeEvent(input$Rt_download,{
                     paste0("Outcome", Sys.Date(), ".png")
                },
                content = function(file) {
-                    ggsave(file, plot = figs$fig_Rt, device = 'png')
+                    figs$fig_Rt
+                    ggsave(file, height = 7, width = 12)
                }
           )
           
@@ -478,14 +480,13 @@ observeEvent(input$Rt_download,{
                     paste0("Outcome", Sys.Date(), ".tiff")
                },
                content = function(file) {
-                    ggsave(file, plot = figs$fig_Rt, device = 'tiff')
+                    figs$fig_Rt
+                    ggsave(file, height = 7, width = 12)
                }
           )
           
           output$download_Rt_pdf <- downloadHandler(
-               filename = function(){
-                    paste0("Outcome", Sys.Date(), ".pdf")
-               },
+               filename = 'outcome.pdf',
                content = function(file) {
                     pdf(file)
                     print(figs$fig_Rt)
