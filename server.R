@@ -8,13 +8,13 @@ function(input, output, session) {
   figs <- reactiveValues(fig_epicurve = NULL,
                          fig_earlyR_R0 = NULL,
                          fig_R0_R0 = NULL,
-                         fig_R0_Rt = NULL)
+                         fig_Rt = NULL)
   
-  source('server/data_input.R', local = TRUE, encoding = 'utf-8')
-  source('server/basic_RN.R', local = TRUE, encoding = 'utf-8')
-  source('server/real_RN.R', local = TRUE, encoding = 'utf-8')
+  source('server/data_input.R', local = TRUE, encoding = 'UTF-8')
+  source('server/basic_RN.R', local = TRUE, encoding = 'UTF-8')
+  source('server/real_RN.R', local = TRUE, encoding = 'UTF-8')
   
-  source('server/massage.R', local = TRUE, encoding = 'utf-8')
+  source('server/massage.R', local = TRUE, encoding = 'UTF-8')
   
   observeEvent(input$Tab_dataload, {
     if(is.null(input$data_raw)){

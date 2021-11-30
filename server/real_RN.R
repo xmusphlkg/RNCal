@@ -4,6 +4,7 @@
 values$R0_gt <- NULL
 
 observeEvent(input$epiestim_parametric_si_data,{
+     
   if(input$epiestim_parametric_si_data == "Delta_广东"){
     updateNumericInput(
       inputId = 'epiestim_parametric_si_std',
@@ -18,14 +19,15 @@ observeEvent(input$epiestim_parametric_si_data,{
   }
 })
 
-observeEvent(input$EpiEstim_rt_confirmed,{
+observeEvent(input$EpiEstim_parametric_confirmed,{
   mean_si <- input$epiestim_parametric_si_mean
   std_si <- input$epiestim_parametric_si_std
   datafile <- values$df_plot %>% 
     group_by(onset) %>% 
     summarise(X = n())
-  start_date <- input$epiestim_parametric_si_first
-  space_date <- input$epiestim_parametric_si_width
+  
+  start_date <- as.numeric(input$epiestim_parametric_si_first)
+  space_date <- as.numeric(input$epiestim_parametric_si_width)
   
   start_dates <- seq(start_date, nrow(datafile)-space_date)
   end_dates <- start_dates + space_date
@@ -50,8 +52,175 @@ observeEvent(input$EpiEstim_rt_confirmed,{
   outcome$t_start <- date_st + outcome$t_start
   outcome$t_end <- date_st + outcome$t_end
   
+  date_breaks <- values$date_breaks
+  
+  fig <- ggplot(data = outcome, mapping = aes(x = date))+
+       geom_ribbon(mapping = aes(ymin = `Quantile.0.025(R)`, ymax = `Quantile.0.975(R)`, fill = 'red'),
+                   alpha = 0.3, show.legend = F)+
+       geom_line(mapping = aes(y = `Median(R)`, color = 'red'), size = 1, show.legend = F)+
+       geom_line(mapping = aes(y = 1), color = 'black', size = 1, linetype="dashed", show.legend = F)+
+       # geom_text(mapping = aes(x = max(date)+1, y = 1, label = 'R[t]==1.0'), parse=T)+
+       annotate('text', x = max(outcome$date), y = 1, size = 12/.pt,
+                label = expression(R[t]==1),
+                hjust = 0,
+                fontface = "bold",
+                family= 'Times New Roman')+
+       scale_x_date(
+            expand = c(0,0),
+            date_labels = "%m月%d日",
+            date_breaks = date_breaks)+
+       scale_y_continuous(expand = expansion(mult = c(0, 0.1)),
+                          limits = c(0, NA))+
+       labs(x = "", y = expression(R[t]))+
+       theme_set()+
+       # theme(plot.margin=unit(c(1,3,1,1),'lines'))+
+       coord_cartesian(clip = "off")
+  
+  figs$fig_Rt <- fig
+  values$df_Rt <- outcome
 })
 
+observeEvent(input$EpiEstim_non_parametric_confirmed,{
+     si_distr <- hot_to_r(input$non_parametric_si_data)
+     names(si_distr) <- c('n', 'freq')
+     start_date <- as.numeric(input$epiestim_non_parametric_si_first)
+     space_date <- as.numeric(input$epiestim_non_parametric_si_width)
+     
+     datafile <- values$df_plot %>% 
+          group_by(onset) %>% 
+          summarise(X = n())
+     names(datafile) <- c('dates', 'I')
+     
+     date_st <- min(datafile$dates)
+     si_distr <- as.numeric(si_distr$freq)
+     start_dates <- seq(start_date, nrow(datafile)-space_date)
+     end_dates <- start_dates + space_date
+     
+     config_lit <- make_config(
+          list(si_distr = si_distr,
+               t_start = start_dates,
+               t_end = end_dates)
+     )
+     
+     epiestim_res_lit <- estimate_R(
+          incid = datafile,
+          method = "non_parametric_si",
+          config = config_lit
+     )
+     
+     outcome <- epiestim_res_lit$R
+     outcome$date <- (outcome$t_start + outcome$t_end)/2 + date_st
+     outcome$t_start <- date_st + outcome$t_start
+     outcome$t_end <- date_st + outcome$t_end
+     
+     date_breaks <- values$date_breaks
+     
+     fig <- ggplot(data = outcome, mapping = aes(x = date))+
+          geom_ribbon(mapping = aes(ymin = `Quantile.0.025(R)`, ymax = `Quantile.0.975(R)`, fill = 'red'),
+                      alpha = 0.3, show.legend = F)+
+          geom_line(mapping = aes(y = `Median(R)`, color = 'red'), size = 1, show.legend = F)+
+          geom_line(mapping = aes(y = 1), color = 'black', size = 1, linetype="dashed", show.legend = F)+
+          # geom_text(mapping = aes(x = max(date)+1, y = 1, label = 'R[t]==1.0'), parse=T)+
+          annotate('text', x = max(outcome$date), y = 1, size = 12/.pt,
+                   label = expression(R[t]==1),
+                   hjust = 0,
+                   fontface = "bold",
+                   family= 'Times New Roman')+
+          scale_x_date(
+               expand = c(0,0),
+               date_labels = "%m月%d日",
+               date_breaks = date_breaks)+
+          scale_y_continuous(expand = c(0,0))+
+          labs(x = "", y = expression(R[t]))+
+          theme_set()+
+          # theme(plot.margin=unit(c(1,3,1,1),'lines'))+
+          coord_cartesian(clip = "off")
+     
+     figs$fig_Rt <- fig
+     values$df_Rt <- outcome
+     output$fig_EpiEstim_Rt <- renderPlot({
+          fig
+     })
+})
+
+observeEvent(input$EpiEstim_uncertain_si_confirmed,{
+     start_date  <- as.numeric(input$epiestim_uncertain_si_first)
+     space_date  <- as.numeric(input$epiestim_uncertain_si_width)
+     mean_si     <- input$epiestim_uncertain_si_mean_si
+     std_mean_si <- input$epiestim_uncertain_si_std_mean_si
+     min_mean_si <- input$epiestim_uncertain_si_min_mean_si
+     max_mean_si <- input$epiestim_uncertain_si_max_mean_si
+     std_si      <- input$epiestim_uncertain_si_std_si
+     std_std_si  <- input$epiestim_uncertain_si_std_std_si
+     min_std_si  <- input$epiestim_uncertain_si_min_std_si
+     max_std_si  <- input$epiestim_uncertain_si_max_std_si
+     n1          <- input$epiestim_uncertain_si_n1
+     n2          <- input$epiestim_uncertain_si_n2
+     
+     
+     datafile <- values$df_plot %>% 
+          group_by(onset) %>% 
+          summarise(X = n())
+     names(datafile) <- c('dates', 'I')
+     date_st <- min(datafile$dates)
+     
+     start_dates <- seq(start_date, nrow(datafile)-space_date)
+     end_dates <- start_dates + space_date
+     
+     config_lit <- make_config(
+          list(t_start     = start_dates,
+               t_end       = end_dates,
+               mean_si     = mean_si, 
+               std_mean_si = std_mean_si,
+               min_mean_si = min_mean_si, 
+               max_mean_si = max_mean_si,
+               std_si      = std_si, 
+               std_std_si  = std_std_si,
+               min_std_si  = min_std_si,
+               max_std_si  = max_std_si,
+               n1          = n1, 
+               n2          = n2))
+     
+     epiestim_res_lit <- estimate_R(
+          incid = datafile,
+          method = "uncertain_si",
+          config = config_lit
+     )
+     
+     outcome <- epiestim_res_lit$R
+     outcome$date <- (outcome$t_start + outcome$t_end)/2 + date_st
+     outcome$t_start <- date_st + outcome$t_start
+     outcome$t_end <- date_st + outcome$t_end
+     
+     date_breaks <- values$date_breaks
+     
+     fig <- ggplot(data = outcome, mapping = aes(x = date))+
+          geom_ribbon(mapping = aes(ymin = `Quantile.0.025(R)`, ymax = `Quantile.0.975(R)`, fill = 'red'),
+                      alpha = 0.3, show.legend = F)+
+          geom_line(mapping = aes(y = `Median(R)`, color = 'red'), size = 1, show.legend = F)+
+          geom_line(mapping = aes(y = 1), color = 'black', size = 1, linetype="dashed", show.legend = F)+
+          # geom_text(mapping = aes(x = max(date)+1, y = 1, label = 'R[t]==1.0'), parse=T)+
+          annotate('text', x = max(outcome$date), y = 1, size = 12/.pt,
+                   label = expression(R[t]==1),
+                   hjust = 0,
+                   fontface = "bold",
+                   family= 'Times New Roman')+
+          scale_x_date(
+               expand = c(0,0),
+               date_labels = "%m月%d日",
+               date_breaks = date_breaks)+
+          scale_y_continuous(expand = c(0,0))+
+          labs(x = "", y = expression(R[t]))+
+          theme_set()+
+          # theme(plot.margin=unit(c(1,3,1,1),'lines'))+
+          coord_cartesian(clip = "off")
+     
+     figs$fig_Rt <- fig
+     values$df_Rt <- outcome
+     output$fig_EpiEstim_Rt <- renderPlot({
+          fig
+     })
+})
 
 
 output$non_parametric_si_data <- renderRHandsontable({
@@ -75,31 +244,6 @@ output$non_si_from_data_data <- renderRHandsontable({
     hot_context_menu(allowColEdit = FALSE, allowRowEdit = TRUE)
 })
 
-observeEvent(input$confirmed_packages,{
-  if(input$select_packages == 'EpiEstim'){
-    if(input$epiestim_method == "parametric_si"){
-      
-      
-      
-      start_dates <- seq(2,nrow(df)-4)
-      end_dates <- start_dates + 4
-      
-      config_lit <- make_config(
-        list(mean_si = 2.3,
-             std_si = 3.4,
-             t_start = start_dates,
-             t_end = end_dates)
-      )
-    }
-  }
-})
-
-
-# output$R0_gt_data_si <- renderRHandsontable({
-#   DF <- data.frame(SI = H1N1.serial.interval)
-#   rhandsontable(DF, language = 'zh-CN') %>% 
-#     hot_context_menu(allowColEdit = FALSE, allowRowEdit = TRUE)
-# })
 
 # R0 ----------------------------------------------------------------------
 
@@ -119,7 +263,6 @@ output$R0_gt_data_si <- renderRHandsontable({
   rhandsontable(DF, language = 'zh-CN') %>% 
     hot_context_menu(allowColEdit = FALSE, allowRowEdit = TRUE)
 })
-
 
 observeEvent(input$R0_gt_data_confirmed,{
   
@@ -177,7 +320,6 @@ observeEvent(input$R0_gt_data_gt_example,{
   )
 })
 
-
 observeEvent(input$R0_Rt_confirmed,{
   gt <- values$R0_gt
   df <- values$df_plot %>% 
@@ -212,6 +354,11 @@ observeEvent(input$R0_Rt_confirmed,{
     values$df_Rt <- datafile
   }
   
+  output$R0_est_Rt <- renderPrint(
+       print(df_Rt)
+  )
+  
+  
   date_breaks <- values$date_breaks
   
   fig <- ggplot(data = datafile, mapping = aes(x = date))+
@@ -234,149 +381,134 @@ observeEvent(input$R0_Rt_confirmed,{
     theme_set()+
     # theme(plot.margin=unit(c(1,3,1,1),'lines'))+
     coord_cartesian(clip = "off")
-  fig
+  
+  figs$fig_Rt <- fig
+  
+  output$fig_R0_Rt <- renderPlot({
+       fig
+  })
 })
 
-# EpiNow2 -----------------------------------------------------------------
 
-observeEvent(input$select_packages, {
-  if(input$select_packages == "EpiNow2"){
-    showModal(
-      modalDialog(
-        title = "Sorry",
-        fluidRow(
-          column(
-            width = 12,
-            h3('抱歉，这个包怎么用我还搞不清。'),
-            br(),
-            h4("如果你会的话，欢迎联系技术支持，感谢~"),
-            a(href="fjmulkg@outlook.com", "技术支持")
+# download button ---------------------------------------------------------
+
+observeEvent(input$Rt_download,{
+     if (!is.null(values$df_plot)){
+          showModal(
+               modalDialog(
+                    fluidRow(
+                         column(
+                              width = 12,
+                              align = "center",
+                              downloadButton(
+                                   "download_Rt_png",
+                                   "下载结果(png)",
+                                   icon = icon("file-image"),
+                                   class = 'butt'
+                              )
+                         )
+                    ),
+                    br(),
+                    fluidRow(
+                         column(
+                              width = 12,
+                              align = "center",
+                              downloadButton(
+                                   "download_Rt_tiff",
+                                   "下载结果(tiff)",
+                                   icon = icon("file-image"),
+                                   class = 'butt'
+                              )
+                         )
+                    ),
+                    br(),
+                    fluidRow(
+                         column(
+                              width = 12,
+                              align = "center",
+                              downloadButton(
+                                   "download_Rt_pdf",
+                                   "下载结果(PDF)",
+                                   icon = icon("file-pdf"),
+                                   class = 'butt'
+                              )
+                         )
+                    ),
+                    br(),
+                    fluidRow(
+                         column(
+                              width = 12,
+                              align = "center",
+                              downloadButton(
+                                   "download_Rt_csv",
+                                   "下载数据(csv)",
+                                   icon = icon("file-excel"),
+                                   class = 'butt'
+                              )
+                         )
+                    ),
+                    title = "下载",
+                    size = "s",
+                    footer = list(
+                         modalButton("取消")
+                    )
+               )
           )
-        ),
-        size = 'l',
-        footer = list(
-          modalButton("确定")
-        )
-      )
-    )
-  }
-})
-
-
-
-## incubation period --------
-output$EpiNow2_incubation_data <- renderRHandsontable({
-  DF <- data.frame(
-    "发病时间" = linelist$date_onset[1:10],
-    "感染时间" = linelist$date_infection[1:10]
-  )
-  rhandsontable(DF, language = 'zh-CN') %>% 
-    hot_context_menu(allowColEdit = FALSE, allowRowEdit = TRUE) %>% 
-    hot_cols(colWidths = 100, format = "0")
-})
-
-observeEvent(input$EpiNow2_incubation_period_confirmed, {
-  incubation_period <- NULL
-  
-  if(input$EpiNow2_incubation_period_type == 'fit'){
-    DF <- hot_to_r(input$EpiNow2_incubation_data)
-    names(DF) <- c('date_onset', 'date_infection')
-    
-    dist <- input$input.EpiNow2_incubation_dist
-    max_value <- input$input.EpiNow2_incubation_max
-    
-    incubation_period <- bootstrapped_dist_fit(
-      DF$date_onset - DF$date_infection,
-      dist = dist,
-      max_value = max_value,
-      bootstraps = 1
-    )
-  }
-  
-  if(input$EpiNow2_incubation_period_type == 'input'){
-    incubation_period <- list(
-      mean = log(input$input.EpiNow2_incubation_mean),
-      mean_sd = log(input$input.EpiNow2_incubation_mean_sd),
-      sd = log(input$input.EpiNow2_incubation_sd),
-      sd_sd = log(input.EpiNow2_incubation_sd_sd),
-      max = input$EpiNow2_incubation_max
-    )
-  }
-  
-  if(input$EpiNow2_incubation_period_type == 'example'){
-    incubation_period <- get_incubation_period(disease = "SARS-CoV-2", source = "lauer")
-  }
-  
-  output$EpiNow2_incubation_period_outcome <- renderPrint({
-    print("潜伏期设置")
-    print(incubation_period)
-  })
-  showModal(
-    modalDialog(
-      title = "EpiNow2设置",
-      fluidRow(
-        column(
-          width = 6,
-          verbatimTextOutput('EpiNow2_incubation_period_outcome', placeholder = T),
-        ),
-        column(
-          width = 6,
-          verbatimTextOutput('EpiNow2_generation_times_outcome', placeholder = T),
-        )
-      ),
-      size = 'l',
-      footer = list(
-        modalButton("确定")
-      )
-    )
-  )
-  
-  values$EpiNow2_incubation_period <- incubation_period
-})
-
-## generation times --------
-
-observeEvent(input$EpiNow2_gt_confirmed, {
-  generation_times <- NULL
-  
-  if(input$EpiNow2_gt_input_type == 'example'){
-    generation_times <- get_generation_time(disease = "SARS-CoV-2", source = "ganyani")
-  }
-  
-  if(input$EpiNow2_gt_input_type == 'GT'){
-    generation_times <- list(
-      mean = log(input$input.EpiNow2_gt_input_mean),
-      mean_sd = log(input$input.EpiNow2_gt_input_mean_sd),
-      sd = log(input$input.EpiNow2_gt_input_sd),
-      sd_sd = log(input.EpiNow2_gt_input_sd_sd),
-      max = input$EpiNow2_gt_input_max
-    )
-  }
-  
-  output$EpiNow2_generation_times_outcome <- renderPrint({
-    print("代间距设置")
-    print(generation_times)
-  })
-  
-  showModal(
-    modalDialog(
-      title = "EpiNow2设置",
-      fluidRow(
-        column(
-          width = 6,
-          verbatimTextOutput('EpiNow2_incubation_period_outcome', placeholder = T),
-        ),
-        column(
-          width = 6,
-          verbatimTextOutput('EpiNow2_generation_times_outcome', placeholder = T),
-        )
-      ),
-      size = 'l',
-      footer = list(
-        modalButton("确定")
-      )
-    )
-  )
-  
-  values$EpiNow2_generation_times <- generation_times
+          
+          output$download_Rt_csv <- downloadHandler(
+               filename = function(){
+                    paste0("Outcome", Sys.Date(), ".csv")
+               },
+               content = function(file) {
+                    write.csv(values$df_Rt, file, row.names = FALSE)
+               }
+          )
+          
+          output$download_Rt_png <- downloadHandler(
+               filename = function(){
+                    paste0("Outcome", Sys.Date(), ".png")
+               },
+               content = function(file) {
+                    ggsave(file, plot = figs$fig_Rt, device = 'png')
+               }
+          )
+          
+          output$download_Rt_tiff <- downloadHandler(
+               filename = function(){
+                    paste0("Outcome", Sys.Date(), ".tiff")
+               },
+               content = function(file) {
+                    ggsave(file, plot = figs$fig_Rt, device = 'tiff')
+               }
+          )
+          
+          output$download_Rt_pdf <- downloadHandler(
+               filename = function(){
+                    paste0("Outcome", Sys.Date(), ".pdf")
+               },
+               content = function(file) {
+                    pdf(file)
+                    print(figs$fig_Rt)
+                    dev.off()
+               }
+          )
+          
+     } else {
+          showModal(
+               modalDialog(
+                    fluidRow(
+                         column(
+                              width = 12,
+                              align = "center",
+                              h3('没找到数据, 请点击“数据预览”按钮并出现流行曲线后再试~')
+                         )
+                    ),
+                    title = "Error",
+                    size = "s",
+                    footer = list(
+                         modalButton("确定")
+                    )
+               )
+          )
+     }
 })

@@ -11,9 +11,9 @@ output$data_raw <- renderRHandsontable({
 
 output$data_input <- renderRHandsontable({
   DF <- data.frame(
-    发病日期 = seq(from = Sys.Date()-20, by = "days", length.out = 5),
-    数量 = sample(x = 1:10, size = 5, replace = TRUE),
-    分类 = sample(x = c('A', 'B'), 5 , replace = T)
+    发病日期 = seq(from = Sys.Date()-20, by = "days", length.out = 15),
+    数量 = sample(x = 1:10, size = 15, replace = TRUE),
+    分类 = sample(x = c('A', 'B'), 15 , replace = T)
   )
   rhandsontable(DF, language = 'zh-CN') %>% 
     hot_context_menu(allowColEdit = FALSE, allowRowEdit = TRUE)
@@ -80,6 +80,7 @@ observeEvent(input$trans_input,{
   }
   
   values$date_breaks <- date_breaks
+  # print(values$date_breaks)
   
   ## y axis round
   integer_breaks <- function(n = 5, ...) {
