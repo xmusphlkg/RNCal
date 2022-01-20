@@ -2,12 +2,38 @@
 
 我们是厦门大学公共卫生学院的流行病学课题组，我们致力于让中国的基层疾控部门和公共卫生人员用上更加简单易用的工具，让数据分析和可视化不再有门槛，为此我们开发了一系列产品。
 
-这些产品都是在前人工作的基础上开发的，如果您认为我们的工作帮助到了您，请您移步到[`Github`](https://rstudio.github.io/bslib/)为我们点亮一个星星，这是对我们工作最大的肯定。
+这些产品都是在前人工作的基础上开发的，如果您认为我们的工作帮助到了您，请您移步到[`Github`](https://github.com/xmusphlkg/RNCal)为我们点亮一个星星，这是对我们工作最大的肯定。
 
-如果我们对您的科研工作有所帮助，亦或者是您希望能够引用我们的产品和前人的工作。
+如果您对于我们的产品感兴趣，欢迎关注我们的微信公众号(CTModelling)。
+
+如果您有新的示例数据，可以发送邮件给[fjmulkg@outlook.com](mailto:fjmulkg@outlook.com)， 并提供相关文献的链接和标题，我们收到后将及时更新示例数据。
+
+## Source Code
+
+[`Github`](https://github.com/xmusphlkg/RNCal)
+
+## Update log
+
+> **V1.0.1  2021/11/30**
+
+> 首次上线，支持Epiestim和EarlyR包计算繁殖数。
+
+> **V1.0.2 2021/12/1**
+
+> 增加数据预览功能，增加R0包计算繁殖数。
+
+> **V1.0.3 2021/12/3**
+
+> 修复部分已知问题，我都不知道修复了啥？
+
+> **V1.1.1 2021/12/10**
+
+> 修复了很多问题，诸如：错别字修改，警告信息不显示，数据空值和缺失导致程序崩溃，支持文件(.xlsx)上传。
 
 
 ## Cite
+
+如果我们对您的科研工作有所帮助，亦或是您希望能够引用我们的产品和前人的工作。
 
 ### EpiEstim
 
@@ -22,20 +48,6 @@
  howpublished = {\url{https://github.com/mrc-ide/EpiEstim}},
  commit={c18949d93fe4dcc384cbcae7567a788622efc781},  
 }
-
-
-### EpiNow2
-
->Sam Abbott, Joel Hellewell, Katharine Sherratt, Katelyn Gostic, Joe Hickson, Hamada S. Badr, Michael DeWitt, Robin Thompson, EpiForecasts, and Sebastian Funk (2020). EpiNow2: Estimate Real-Time Case Counts and Time-Varying Epidemiological Parameters, DOI: 10.5281/zenodo.3957489
-
->@Manual{,
-  title = {EpiNow2: Estimate Real-Time Case Counts and Time-Varying Epidemiological Parameters},
-  author = {Sam Abbott and Joel Hellewell and Katharine Sherratt and Katelyn Gostic and Joe Hickson and Hamada S. Badr and Michael DeWitt and Robin Thompson and {EpiForecasts} and Sebastian Funk},
-  year = {2020},
-  doi = {10.5281/zenodo.3957489},
-}
-
-
 
 ### R0
 

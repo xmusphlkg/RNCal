@@ -11,8 +11,9 @@ navbarPage(
   inverse = F,
   header = tagList(
     useShinydashboard(),
+    useShinyalert(),
     setBackgroundColor(color = 'ghostwhite'),
-    # includeHTML('function/googleanalytics.html')
+    includeHTML('ui/googleanalytics.html')
   ),
   tabPanel(title = 'Notice', tab_notice, value = 'Notice'),
   tabPanel(title = '关于', 

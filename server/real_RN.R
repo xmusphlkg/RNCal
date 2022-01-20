@@ -22,65 +22,71 @@ observeEvent(input$epiestim_parametric_si_data,{
 observeEvent(input$EpiEstim_parametric_confirmed,{
   mean_si <- input$epiestim_parametric_si_mean
   std_si <- input$epiestim_parametric_si_std
-  datafile <- values$df_plot %>% 
-    group_by(onset) %>% 
-    summarise(X = n())
-  
   start_date <- as.numeric(input$epiestim_parametric_si_first)
   space_date <- as.numeric(input$epiestim_parametric_si_width)
   
-  start_dates <- seq(start_date, nrow(datafile)-space_date)
-  end_dates <- start_dates + space_date
-  
-  config_lit <- make_config(
-    list(mean_si = mean_si,
-         std_si = std_si,
-         t_start = start_dates,
-         t_end = end_dates)
-  )
-  
-  names(datafile) <- c('dates', 'I')
-  date_st <- min(datafile$dates)
-  epiestim_res_lit <- estimate_R(
-    incid = datafile,
-    method = "parametric_si",
-    config = config_lit
-  )
-  
-  outcome <- epiestim_res_lit$R
-  outcome$date <- (outcome$t_start + outcome$t_end)/2 + date_st
-  outcome$t_start <- date_st + outcome$t_start
-  outcome$t_end <- date_st + outcome$t_end
-  
-  date_breaks <- values$date_breaks
-  
-  fig <- ggplot(data = outcome, mapping = aes(x = date))+
-       geom_ribbon(mapping = aes(ymin = `Quantile.0.025(R)`, ymax = `Quantile.0.975(R)`, fill = 'red'),
-                   alpha = 0.3, show.legend = F)+
-       geom_line(mapping = aes(y = `Median(R)`, color = 'red'), size = 1, show.legend = F)+
-       geom_line(mapping = aes(y = 1), color = 'black', size = 1, linetype="dashed", show.legend = F)+
-       # geom_text(mapping = aes(x = max(date)+1, y = 1, label = 'R[t]==1.0'), parse=T)+
-       annotate('text', x = max(outcome$date), y = 1, size = 12/.pt,
-                label = expression(R[t]==1),
-                hjust = 0,
-                fontface = "bold",
-                family= 'Times New Roman')+
-       scale_x_date(
-            expand = c(0,0),
-            date_labels = "%m月%d日",
-            date_breaks = date_breaks)+
-       scale_y_continuous(expand = expansion(mult = c(0, 0.1)),
-                          limits = c(0, NA))+
-       labs(x = "", y = expression(R[t]))+
-       theme_set()+
-       # theme(plot.margin=unit(c(1,3,1,1),'lines'))+
-       coord_cartesian(clip = "off")
-  
-  figs$fig_Rt <- fig
-  values$df_Rt <- outcome
-  output$fig_EpiEstim_Rt <- renderPlot({
-       fig
-  })
+  if(is.na(mean_si) | is.na(std_si) | is.na(start_date) | is.na(space_date)){
+       shinyalert("提交失败", "原因：关键参数缺失！", 
+                  timer = 5000 , 
+                  type = "error",
+                  size = 'xs')
+  }else{
+       datafile <- values$df_global %>% 
+            group_by(t) %>% 
+            summarise(X = sum(X))
+       
+       start_dates <- seq(start_date, nrow(datafile)-space_date)
+       end_dates <- start_dates + space_date
+       
+       config_lit <- make_config(
+            list(mean_si = mean_si,
+                 std_si = std_si,
+                 t_start = start_dates,
+                 t_end = end_dates)
+       )
+       
+       names(datafile) <- c('dates', 'I')
+       date_st <- min(datafile$dates)
+       epiestim_res_lit <- estimate_R(
+            incid = datafile,
+            method = "parametric_si",
+            config = config_lit
+       )
+       
+       outcome <- epiestim_res_lit$R
+       outcome$date <- (outcome$t_start + outcome$t_end)/2 + date_st
+       outcome$t_start <- date_st + outcome$t_start
+       outcome$t_end <- date_st + outcome$t_end
+       
+       date_breaks <- values$date_breaks
+       
+       fig <- ggplot(data = outcome, mapping = aes(x = date))+
+            geom_ribbon(mapping = aes(ymin = `Quantile.0.025(R)`, ymax = `Quantile.0.975(R)`, fill = 'red'),
+                        alpha = 0.3, show.legend = F)+
+            geom_line(mapping = aes(y = `Median(R)`, color = 'red'), size = 1, show.legend = F)+
+            geom_line(mapping = aes(y = 1), color = 'black', size = 1, linetype="dashed", show.legend = F)+
+            # geom_text(mapping = aes(x = max(date)+1, y = 1, label = 'R[t]==1.0'), parse=T)+
+            annotate('text', x = max(outcome$date), y = 1, size = 12/.pt,
+                     label = expression(R[t]==1),
+                     hjust = 0,
+                     fontface = "bold")+
+            scale_x_date(
+                 expand = c(0,0),
+                 date_labels = "%m/%d",
+                 date_breaks = date_breaks)+
+            scale_y_continuous(expand = expansion(mult = c(0, 0.1)),
+                               limits = c(0, NA))+
+            labs(x = "", y = expression(R[t]))+
+            theme_set()+
+            # theme(plot.margin=unit(c(1,3,1,1),'lines'))+
+            coord_cartesian(clip = "off")
+       
+       figs$fig_Rt <- fig
+       values$df_Rt <- outcome
+       output$fig_EpiEstim_Rt <- renderPlot({
+            fig
+       })
+  }
 })
 
 observeEvent(input$EpiEstim_non_parametric_confirmed,{
@@ -98,9 +104,9 @@ observeEvent(input$EpiEstim_non_parametric_confirmed,{
      start_date <- as.numeric(input$epiestim_non_parametric_si_first)
      space_date <- as.numeric(input$epiestim_non_parametric_si_width)
      
-     datafile <- values$df_plot %>% 
-          group_by(onset) %>% 
-          summarise(X = n())
+     datafile <- values$df_global %>% 
+          group_by(t) %>% 
+          summarise(X = sum(X))
      names(datafile) <- c('dates', 'I')
      
      date_st <- min(datafile$dates)
@@ -136,11 +142,10 @@ observeEvent(input$EpiEstim_non_parametric_confirmed,{
           annotate('text', x = max(outcome$date), y = 1, size = 12/.pt,
                    label = expression(R[t]==1),
                    hjust = 0,
-                   fontface = "bold",
-                   family= 'Times New Roman')+
+                   fontface = "bold")+
           scale_x_date(
                expand = c(0,0),
-               date_labels = "%m月%d日",
+               date_labels = "%m/%d",
                date_breaks = date_breaks)+
           scale_y_continuous(expand = expansion(mult = c(0, 0.1)),
                              limits = c(0, NA))+
@@ -170,70 +175,76 @@ observeEvent(input$EpiEstim_uncertain_si_confirmed,{
      n1          <- input$epiestim_uncertain_si_n1
      n2          <- input$epiestim_uncertain_si_n2
      
-     
-     datafile <- values$df_plot %>% 
-          group_by(onset) %>% 
-          summarise(X = n())
-     names(datafile) <- c('dates', 'I')
-     date_st <- min(datafile$dates)
-     
-     start_dates <- seq(start_date, nrow(datafile)-space_date)
-     end_dates <- start_dates + space_date
-     
-     config_lit <- make_config(
-          list(t_start     = start_dates,
-               t_end       = end_dates,
-               mean_si     = mean_si, 
-               std_mean_si = std_mean_si,
-               min_mean_si = min_mean_si, 
-               max_mean_si = max_mean_si,
-               std_si      = std_si, 
-               std_std_si  = std_std_si,
-               min_std_si  = min_std_si,
-               max_std_si  = max_std_si,
-               n1          = n1, 
-               n2          = n2))
-     
-     epiestim_res_lit <- estimate_R(
-          incid = datafile,
-          method = "uncertain_si",
-          config = config_lit
-     )
-     
-     outcome <- epiestim_res_lit$R
-     outcome$date <- (outcome$t_start + outcome$t_end)/2 + date_st
-     outcome$t_start <- date_st + outcome$t_start
-     outcome$t_end <- date_st + outcome$t_end
-     
-     date_breaks <- values$date_breaks
-     
-     fig <- ggplot(data = outcome, mapping = aes(x = date))+
-          geom_ribbon(mapping = aes(ymin = `Quantile.0.025(R)`, ymax = `Quantile.0.975(R)`, fill = 'red'),
-                      alpha = 0.3, show.legend = F)+
-          geom_line(mapping = aes(y = `Median(R)`, color = 'red'), size = 1, show.legend = F)+
-          geom_line(mapping = aes(y = 1), color = 'black', size = 1, linetype="dashed", show.legend = F)+
-          # geom_text(mapping = aes(x = max(date)+1, y = 1, label = 'R[t]==1.0'), parse=T)+
-          annotate('text', x = max(outcome$date), y = 1, size = 12/.pt,
-                   label = expression(R[t]==1),
-                   hjust = 0,
-                   fontface = "bold",
-                   family= 'Times New Roman')+
-          scale_x_date(
-               expand = c(0,0),
-               date_labels = "%m月%d日",
-               date_breaks = date_breaks)+
-          scale_y_continuous(expand = expansion(mult = c(0, 0.1)),
-                             limits = c(0, NA))+
-          labs(x = "", y = expression(R[t]))+
-          theme_set()+
-          # theme(plot.margin=unit(c(1,3,1,1),'lines'))+
-          coord_cartesian(clip = "off")
-     
-     figs$fig_Rt <- fig
-     values$df_Rt <- outcome
-     output$fig_EpiEstim_Rt <- renderPlot({
-          fig
-     })
+     if(is.na(mean_si) | is.na(std_si) | is.na(start_date) | is.na(space_date) | is.na(std_mean_si) | is.na(min_mean_si) |
+        is.na(max_mean_si) | is.na(std_std_si) | is.na(min_std_si) | is.na(max_std_si) | is.na(n1) | is.na(n2)){
+          shinyalert("提交失败", "原因：关键参数缺失！", 
+                     timer = 5000 , 
+                     type = "error",
+                     size = 'xs')
+     }else{
+          datafile <- values$df_global %>% 
+               group_by(t) %>% 
+               summarise(X = sum(X))
+          names(datafile) <- c('dates', 'I')
+          date_st <- min(datafile$dates)
+          
+          start_dates <- seq(start_date, nrow(datafile)-space_date)
+          end_dates <- start_dates + space_date
+          
+          config_lit <- make_config(
+               list(t_start     = start_dates,
+                    t_end       = end_dates,
+                    mean_si     = mean_si, 
+                    std_mean_si = std_mean_si,
+                    min_mean_si = min_mean_si, 
+                    max_mean_si = max_mean_si,
+                    std_si      = std_si, 
+                    std_std_si  = std_std_si,
+                    min_std_si  = min_std_si,
+                    max_std_si  = max_std_si,
+                    n1          = n1, 
+                    n2          = n2))
+          
+          epiestim_res_lit <- estimate_R(
+               incid = datafile,
+               method = "uncertain_si",
+               config = config_lit
+          )
+          
+          outcome <- epiestim_res_lit$R
+          outcome$date <- (outcome$t_start + outcome$t_end)/2 + date_st
+          outcome$t_start <- date_st + outcome$t_start
+          outcome$t_end <- date_st + outcome$t_end
+          
+          date_breaks <- values$date_breaks
+          
+          fig <- ggplot(data = outcome, mapping = aes(x = date))+
+               geom_ribbon(mapping = aes(ymin = `Quantile.0.025(R)`, ymax = `Quantile.0.975(R)`, fill = 'red'),
+                           alpha = 0.3, show.legend = F)+
+               geom_line(mapping = aes(y = `Median(R)`, color = 'red'), size = 1, show.legend = F)+
+               geom_line(mapping = aes(y = 1), color = 'black', size = 1, linetype="dashed", show.legend = F)+
+               # geom_text(mapping = aes(x = max(date)+1, y = 1, label = 'R[t]==1.0'), parse=T)+
+               annotate('text', x = max(outcome$date), y = 1, size = 12/.pt,
+                        label = expression(R[t]==1),
+                        hjust = 0,
+                        fontface = "bold")+
+               scale_x_date(
+                    expand = c(0,0),
+                    date_labels = "%m/%d",
+                    date_breaks = date_breaks)+
+               scale_y_continuous(expand = expansion(mult = c(0, 0.1)),
+                                  limits = c(0, NA))+
+               labs(x = "", y = expression(R[t]))+
+               theme_set()+
+               # theme(plot.margin=unit(c(1,3,1,1),'lines'))+
+               coord_cartesian(clip = "off")
+          
+          figs$fig_Rt <- fig
+          values$df_Rt <- outcome
+          output$fig_EpiEstim_Rt <- renderPlot({
+               fig
+          })
+     }
 })
 
 output$non_parametric_si_data <- renderRHandsontable({
@@ -323,9 +334,13 @@ observeEvent(input$R0_gt_data_gt_example,{
 
 observeEvent(input$R0_Rt_confirmed,{
   gt <- values$R0_gt
-  df <- values$df_plot %>% 
-    group_by(onset) %>% 
-    summarise(X = n())
+  df <- values$df_global %>% 
+       group_by(t) %>% 
+       summarise(X = sum(X))
+  # 
+  # df <- values$df_plot %>% 
+  #   group_by(onset) %>% 
+  #   summarise(X = n())
   df_value <- df$X
   names(df_value) <- df$onset
   if(input$R0_Rt_est_function == 'TD'){
@@ -371,11 +386,10 @@ observeEvent(input$R0_Rt_confirmed,{
     annotate('text', x = max(datafile$date), y = 1, size = 12/.pt,
              label = expression(R[t]==1),
              hjust = 0,
-             fontface = "bold",
-             family= 'Times New Roman')+
+             fontface = "bold")+
     scale_x_date(
       expand = c(0,0),
-      date_labels = "%m月%d日",
+      date_labels = "%m/%d",
       date_breaks = date_breaks)+
     scale_y_continuous(expand = c(0,0))+
     labs(x = "", y = expression(R[t]))+

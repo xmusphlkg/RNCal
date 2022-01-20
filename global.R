@@ -1,4 +1,5 @@
 library(tidyverse)
+library(openxlsx)
 
 library(shiny)
 library(shinyWidgets)
@@ -11,7 +12,7 @@ library(lubridate)
 library(extrafont)
 library(RColorBrewer)
 
-suppressWarnings(font_import(pattern = "times", prompt = F))
+# suppressWarnings(font_import(paths = './fonts/', pattern = "Times", prompt = F))
 
 library(incidence)
 
