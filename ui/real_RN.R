@@ -15,14 +15,6 @@ real_RN <- tabPanelBody(
           selected = 'EpiEstim',
           options = list(style = "btn-danger")
         ),
-        # actionBttn(
-        #   inputId = 'confirmed_packages',
-        #   label = '计算Rt',
-        #   color = 'danger',
-        #   size = 'lg',
-        #   style = 'float',
-        #   icon = icon('power-off')
-        # ),
         actionBttn(
           inputId = 'Tab_R0',
           label = '转到R0计算',
@@ -46,7 +38,7 @@ real_RN <- tabPanelBody(
                                    label = '方法设置',
                                    choices = c("non_parametric_si", "parametric_si", "uncertain_si"
                                                # "si_from_data", "si_from_sample"
-                                               ),
+                                   ),
                                    selected = 'parametric_si'
                                  ),
                                  conditionalPanel(condition = 'input.epiestim_method == "parametric_si"',
@@ -74,7 +66,7 @@ real_RN <- tabPanelBody(
                                                       choices = 2:30,
                                                       selected = 3
                                                     )
-                                                    ),
+                                                  ),
                                                   column(
                                                     width = 6,
                                                     pickerInput(
@@ -118,12 +110,12 @@ real_RN <- tabPanelBody(
                                                       selected = 'Delta_广东'
                                                     ),
                                                     pickerInput(
-                                                         inputId = 'epiestim_non_parametric_si_first',
-                                                         label = '从第几天开始计算？',
-                                                         choices = 2:30,
-                                                         selected = 3
+                                                      inputId = 'epiestim_non_parametric_si_first',
+                                                      label = '从第几天开始计算？',
+                                                      choices = 2:30,
+                                                      selected = 3
                                                     )
-                                                    ),
+                                                  ),
                                                   column(
                                                     width = 6,
                                                     pickerInput(
@@ -132,142 +124,142 @@ real_RN <- tabPanelBody(
                                                       choices = 3:30,
                                                       selected = 7
                                                     ),
-                                                  div(
-                                                       column(
-                                                            width = 12,
-                                                            align="center",
-                                                            actionBttn(
-                                                                 inputId = 'EpiEstim_non_parametric_confirmed',
-                                                                 label = '估计Rt',
-                                                                 color = 'danger',
-                                                                 style = 'float'
-                                                            )
-                                                       ),
-                                                       style = 'top: 25px;position: relative;'
-                                                  )
+                                                    div(
+                                                      column(
+                                                        width = 12,
+                                                        align="center",
+                                                        actionBttn(
+                                                          inputId = 'EpiEstim_non_parametric_confirmed',
+                                                          label = '估计Rt',
+                                                          color = 'danger',
+                                                          style = 'float'
+                                                        )
+                                                      ),
+                                                      style = 'top: 25px;position: relative;'
+                                                    )
                                                   )
                                  ),
                                  conditionalPanel(condition = 'input.epiestim_method == "uncertain_si"',
                                                   column(
-                                                       width = 6,
-                                                       pickerInput(
-                                                            inputId = 'epiestim_uncertain_si_data',
-                                                            label = '默认数据',
-                                                            choices = c("Delta_广东" = '3.4-2.3', 
-                                                                        "Delta_01" = '3.4-2.3', 
-                                                                        "Delta_02" = '3.4-2.3', 
-                                                                        "Delta_03" = '3.4-2.3',
-                                                                        "Delta_04" = '3.4-2.3'),
-                                                            selected = 'Delta_广东'
-                                                       ),
-                                                       pickerInput(
-                                                            inputId = 'epiestim_uncertain_si_first',
-                                                            label = '从第几天开始计算？',
-                                                            choices = 2:30,
-                                                            selected = 3
-                                                       )
+                                                    width = 6,
+                                                    pickerInput(
+                                                      inputId = 'epiestim_uncertain_si_data',
+                                                      label = '默认数据',
+                                                      choices = c("Delta_广东" = '3.4-2.3', 
+                                                                  "Delta_01" = '3.4-2.3', 
+                                                                  "Delta_02" = '3.4-2.3', 
+                                                                  "Delta_03" = '3.4-2.3',
+                                                                  "Delta_04" = '3.4-2.3'),
+                                                      selected = 'Delta_广东'
+                                                    ),
+                                                    pickerInput(
+                                                      inputId = 'epiestim_uncertain_si_first',
+                                                      label = '从第几天开始计算？',
+                                                      choices = 2:30,
+                                                      selected = 3
+                                                    )
                                                   ),
                                                   column(
-                                                       width = 6,
-                                                       pickerInput(
-                                                            inputId = 'epiestim_uncertain_si_width',
-                                                            label = '计算间距(天)',
-                                                            choices = 3:30,
-                                                            selected = 7
-                                                       ),
-                                                       div(
-                                                            column(
-                                                                 width = 12,
-                                                                 align="center",
-                                                                 actionBttn(
-                                                                      inputId = 'EpiEstim_uncertain_si_confirmed',
-                                                                      label = '估计Rt',
-                                                                      color = 'danger',
-                                                                      style = 'float'
-                                                                 )
-                                                            ),
-                                                            style = 'top: 25px;position: relative;'
-                                                       )
+                                                    width = 6,
+                                                    pickerInput(
+                                                      inputId = 'epiestim_uncertain_si_width',
+                                                      label = '计算间距(天)',
+                                                      choices = 3:30,
+                                                      selected = 7
+                                                    ),
+                                                    div(
+                                                      column(
+                                                        width = 12,
+                                                        align="center",
+                                                        actionBttn(
+                                                          inputId = 'EpiEstim_uncertain_si_confirmed',
+                                                          label = '估计Rt',
+                                                          color = 'danger',
+                                                          style = 'float'
+                                                        )
+                                                      ),
+                                                      style = 'top: 25px;position: relative;'
+                                                    )
                                                   )
                                  )
                                ),
                                conditionalPanel(condition = 'input.epiestim_method == "non_parametric_si"',
                                                 column(
-                                                     width = 6,
-                                                     rHandsontableOutput('non_parametric_si_data', height = '400px')
+                                                  width = 6,
+                                                  rHandsontableOutput('non_parametric_si_data', height = '400px')
                                                 )
                                ),
                                conditionalPanel(condition = 'input.epiestim_method == "uncertain_si"',
                                                 column(
-                                                     width = 3,
-                                                     numericInput(
-                                                          inputId = 'epiestim_uncertain_si_mean_si',
-                                                          label = '代间距(SI)均数',
-                                                          width = '100%',
-                                                          value = 2.6
-                                                     ),
-                                                     numericInput(
-                                                          inputId = 'epiestim_uncertain_si_min_mean_si',
-                                                          label = '代间距(SI)均数最小值',
-                                                          width = '100%',
-                                                          value = 1
-                                                     ),
-                                                     numericInput(
-                                                          inputId = 'epiestim_uncertain_si_max_mean_si',
-                                                          label = '代间距(SI)均数最大值',
-                                                          width = '100%',
-                                                          value = 4.2
-                                                     ),
-                                                     numericInput(
-                                                          inputId = 'epiestim_uncertain_si_std_mean_si',
-                                                          label = '代间距(SI)均数标准差',
-                                                          width = '100%',
-                                                          value = 1
-                                                     ),
-                                                     numericInput(
-                                                          inputId = 'epiestim_uncertain_si_n1',
-                                                          label = 'n1',
-                                                          width = '100%',
-                                                          value = 100
-                                                     )
+                                                  width = 3,
+                                                  numericInput(
+                                                    inputId = 'epiestim_uncertain_si_mean_si',
+                                                    label = '代间距(SI)均数',
+                                                    width = '100%',
+                                                    value = 2.6
+                                                  ),
+                                                  numericInput(
+                                                    inputId = 'epiestim_uncertain_si_min_mean_si',
+                                                    label = '代间距(SI)均数最小值',
+                                                    width = '100%',
+                                                    value = 1
+                                                  ),
+                                                  numericInput(
+                                                    inputId = 'epiestim_uncertain_si_max_mean_si',
+                                                    label = '代间距(SI)均数最大值',
+                                                    width = '100%',
+                                                    value = 4.2
+                                                  ),
+                                                  numericInput(
+                                                    inputId = 'epiestim_uncertain_si_std_mean_si',
+                                                    label = '代间距(SI)均数标准差',
+                                                    width = '100%',
+                                                    value = 1
+                                                  ),
+                                                  numericInput(
+                                                    inputId = 'epiestim_uncertain_si_n1',
+                                                    label = 'n1',
+                                                    width = '100%',
+                                                    value = 100
+                                                  )
                                                 ),
                                                 column(
-                                                     width = 3,
-                                                     numericInput(
-                                                          inputId = 'epiestim_uncertain_si_std_si',
-                                                          label = '代间距(SI)标准差',
-                                                          width = '100%',
-                                                          value = 1.5
-                                                     ),
-                                                     numericInput(
-                                                          inputId = 'epiestim_uncertain_si_std_std_si',
-                                                          label = '代间距(SI)标准差的标准差',
-                                                          width = '100%',
-                                                          value = 0.5
-                                                     ),
-                                                     numericInput(
-                                                          inputId = 'epiestim_uncertain_si_min_std_si',
-                                                          label = '代间距(SI)标准差最小值',
-                                                          width = '100%',
-                                                          value = 0.5
-                                                     ),
-                                                     numericInput(
-                                                          inputId = 'epiestim_uncertain_si_max_std_si',
-                                                          label = '代间距(SI)标准差最大值',
-                                                          width = '100%',
-                                                          value = 2.5
-                                                     ),
-                                                     numericInput(
-                                                          inputId = 'epiestim_uncertain_si_n2',
-                                                          label = 'n2',
-                                                          width = '100%',
-                                                          value = 100
-                                                     )
+                                                  width = 3,
+                                                  numericInput(
+                                                    inputId = 'epiestim_uncertain_si_std_si',
+                                                    label = '代间距(SI)标准差',
+                                                    width = '100%',
+                                                    value = 1.5
+                                                  ),
+                                                  numericInput(
+                                                    inputId = 'epiestim_uncertain_si_std_std_si',
+                                                    label = '代间距(SI)标准差的标准差',
+                                                    width = '100%',
+                                                    value = 0.5
+                                                  ),
+                                                  numericInput(
+                                                    inputId = 'epiestim_uncertain_si_min_std_si',
+                                                    label = '代间距(SI)标准差最小值',
+                                                    width = '100%',
+                                                    value = 0.5
+                                                  ),
+                                                  numericInput(
+                                                    inputId = 'epiestim_uncertain_si_max_std_si',
+                                                    label = '代间距(SI)标准差最大值',
+                                                    width = '100%',
+                                                    value = 2.5
+                                                  ),
+                                                  numericInput(
+                                                    inputId = 'epiestim_uncertain_si_n2',
+                                                    label = 'n2',
+                                                    width = '100%',
+                                                    value = 100
+                                                  )
                                                 )
                                )
                            )
                          )
-                         ),
+        ),
         # R0 -------------------------------------------------------------------
         conditionalPanel(condition = "input.select_packages == 'R0'",
                          fluidRow(
@@ -316,25 +308,25 @@ real_RN <- tabPanelBody(
                                  )
                                ),
                                conditionalPanel(condition = 'input.R0_Rt_est_function == "TD"',
-                                            column(
-                                              width = 3,
-                                              numericInput(
-                                                inputId = 'R0_TD_nsim',
-                                                label = '模拟次数',
-                                                value = 100,
-                                                width = '100%'
-                                              )
-                                            ),
-                                            column(
-                                              width = 3,
-                                              numericInput(
-                                                inputId = 'R0_Rt_smooth',
-                                                label = 'Rt平滑间隔(天)',
-                                                value = 7,
-                                                min = 2,
-                                                width = '100%'
-                                              )
-                                            )),
+                                                column(
+                                                  width = 3,
+                                                  numericInput(
+                                                    inputId = 'R0_TD_nsim',
+                                                    label = '模拟次数',
+                                                    value = 100,
+                                                    width = '100%'
+                                                  )
+                                                ),
+                                                column(
+                                                  width = 3,
+                                                  numericInput(
+                                                    inputId = 'R0_Rt_smooth',
+                                                    label = 'Rt平滑间隔(天)',
+                                                    value = 7,
+                                                    min = 2,
+                                                    width = '100%'
+                                                  )
+                                                )),
                                div(
                                  column(
                                    width = 3,
@@ -377,7 +369,7 @@ real_RN <- tabPanelBody(
                                                   label = '示例'
                                                 ),
                                                 style = 'top: 25px;position: relative;'
-                                                ),
+                                              ),
                                               column(
                                                 width = 4,
                                                 textAreaInput(
@@ -393,7 +385,7 @@ real_RN <- tabPanelBody(
                          ))
         # end ------------------------------------------------------------------
       )
-      ),
+  ),
   # outcome --------------------------------------------------------------------
   box(title = "结果",
       width = 12,
@@ -418,14 +410,14 @@ real_RN <- tabPanelBody(
                          plotOutput('fig_R0_Rt')
                        ),
                        column(
-                            width = 12,
-                            align = 'right',
-                            actionBttn(
-                                 inputId = 'Rt_download',
-                                 label = '结果下载',
-                                 size = 'sm',
-                                 color = 'warning',
-                                 icon = icon("download"),
-                            )
+                         width = 12,
+                         align = 'right',
+                         actionBttn(
+                           inputId = 'Rt_download',
+                           label = '结果下载',
+                           size = 'sm',
+                           color = 'warning',
+                           icon = icon("download"),
+                         )
                        )))
 )

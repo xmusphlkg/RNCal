@@ -1,4 +1,3 @@
-
 source('ui/notice.R', encoding = 'UTF-8')
 source('ui/data_input.R', encoding = 'UTF-8')
 source('ui/basic_RN.R', encoding = 'UTF-8')
@@ -16,9 +15,6 @@ navbarPage(
     includeHTML('ui/googleanalytics.html')
   ),
   tabPanel(title = 'Notice', tab_notice, value = 'Notice'),
-  tabPanel(title = '关于', 
-           fluidPage(
-             includeMarkdown('ui/about.md')
-           ))
+  tabPanel(title = '关于',
+           fluidPage(includeMarkdown('ui/about.md')))
 )
-
