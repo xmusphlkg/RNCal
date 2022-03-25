@@ -221,25 +221,14 @@ basic_RN <- tabPanelBody(
   box(
     title = "结果",
     conditionalPanel(condition = "input.select_packages_R0 == 'EarlyR'",
-                     plotOutput('fig_earlyR_R0'),
-                     # column(
-                     #   width = 12,
-                     #   align = 'right',
-                     #   actionBttn(
-                     #     inputId = 'R0_earlyR_download',
-                     #     label = '结果下载',
-                     #     size = 'sm',
-                     #     color = 'warning',
-                     #     icon = icon("download"),
-                     #   )
-                     # )),
-                     conditionalPanel(
-                       condition = "input.select_packages_R0 == 'R0'",
-                       column(
-                         width = 12,
-                         verbatimTextOutput('R0_est_R0', placeholder = T),
-                         plotOutput('fig_R0_R0')
-                       )
-                     )
+                     plotOutput('fig_earlyR_R0')),
+    conditionalPanel(
+      condition = "input.select_packages_R0 == 'R0'",
+      column(
+        width = 12,
+        verbatimTextOutput('R0_est_R0', placeholder = T),
+        plotOutput('fig_R0_R0')
+      )
     )
   )
+)
