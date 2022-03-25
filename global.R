@@ -11,6 +11,7 @@ library(shinyalert)
 library(lubridate)
 library(extrafont)
 library(RColorBrewer)
+library(shinydisconnect)
 
 # suppressWarnings(font_import(paths = './fonts/', pattern = "Times", prompt = F))
 

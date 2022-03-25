@@ -9,9 +9,9 @@ data_input <- tabPanelBody(
       box(
         title = "原始数据",
         width = 12,
-        footer = "分类仅用于绘制流行曲线，不影响再生数计算",
+        footer = HTML("分类仅用于绘制流行曲线，不影响再生数计算\n日期格式为“月/日/年”，建议直接从excel中复制粘贴"),
         status = 'warning',
-        rHandsontableOutput('data_raw'),
+        rHandsontableOutput('data_raw', height = '600px'),
         fileInput(
           inputId = 'input_rawdata',
           label = " ",
@@ -39,9 +39,9 @@ data_input <- tabPanelBody(
       box(
         title = "数据输入",
         width = 12,
-        footer = "分类仅用于绘制流行曲线，不影响再生数计算",
+        footer = HTML("分类仅用于绘制流行曲线，不影响再生数计算\n日期格式为“月/日/年”，建议直接从excel中复制粘贴"),
         status = 'warning',
-        rHandsontableOutput("data_input"),
+        rHandsontableOutput("data_input", height = '600px'),
         fileInput(
           inputId = 'input_transdata',
           label = " ",

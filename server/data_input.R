@@ -1,77 +1,102 @@
+
+# Reading upload raw data -------------------------------------------------
+
 observeEvent(input$input_rawdata, {
   file <- input$input_rawdata
-  DF <- read.xlsx(file$datapath)
-  names(DF)[1] <- '发病日期'
-  DF$发病日期    <- convertToDate(DF$发病日期)
-  if (ncol(DF) == 1) {
-    DF$分类    <- 'A'
-  } else {
-    names(DF)[2] <- '分类'
+  DF <- tryCatch({
+    DF <- read.xlsx(file$datapath)
+    names(DF)[1] <- '发病日期'
+    DF$发病日期     <- convertToDate(DF$发病日期)
+    if (ncol(DF) == 1) {
+      DF$分类     <- 'A'
+    } else {
+      names(DF)[2] <- '分类'
+    }
+    DF
+  },
+  warning = function(warn) {
+    showNotification(paste0(warn), type = 'warning')
+    DF
+  },
+  error = function(err) {
+    showNotification(paste0(err), type = 'err')
   }
+  )
   output$data_raw <- renderRHandsontable({
     rhandsontable(DF, language = 'zh-CN') %>%
-      hot_context_menu(allowColEdit = FALSE, allowRowEdit = TRUE)
-  })
-})
-
-observeEvent(input$input_transdata, {
-  file <- input$input_transdata
-  DF <- read.xlsx(file$datapath)
-  names(DF)[1:2] <- c('发病日期', '数量')
-  DF$发病日期    <- convertToDate(DF$发病日期)
-  DF$数量    <- as.numeric(DF$数量)
-  if (ncol(DF) == 2) {
-    DF$分类    <- 'A'
-  } else {
-    names(DF)[3] <- '分类'
-  }
-  output$data_input <- renderRHandsontable({
-    rhandsontable(DF) %>%
       hot_context_menu(allowColEdit = FALSE, allowRowEdit = TRUE) |>
       hot_col("发病日期",
-              dateFormat = "YYYY/MM/DD",
-              type = "date",
+              # dateFormat = "YYYY/MM/DD",
+              # type = "date",
               language = 'zh-CN')
   })
 })
 
+# Reading upload trans data -----------------------------------------------
+
+observeEvent(input$input_transdata, {
+  file <- input$input_transdata
+  DF <- tryCatch({
+    DF <- read.xlsx(file$datapath)
+    names(DF)[1:2] <- c('发病日期', '数量')
+    DF$发病日期     <- convertToDate(DF$发病日期)
+    DF$数量     <- as.numeric(DF$数量)
+    if (ncol(DF) == 2) {
+      DF$分类     <- 'A'
+    } else {
+      names(DF)[3] <- '分类'
+    }
+    DF
+  },
+  warning = function(warn) {
+    showNotification(paste0(warn), type = 'warning')
+    DF
+  },
+  error = function(err) {
+    showNotification(paste0(err), type = 'err')
+  })
+  output$data_input <- renderRHandsontable({
+    rhandsontable(DF, language = 'zh-CN') %>%
+      hot_context_menu(allowColEdit = FALSE, allowRowEdit = TRUE) |>
+      hot_col("发病日期",
+              # dateFormat = "YYYY/MM/DD",
+              # type = "date",
+              language = 'zh-CN')
+  })
+})
+
+# Example input data ------------------------------------------------------
+
 output$data_raw <- renderRHandsontable({
   DF <- data.frame(
-    发病日期    = sample(
-      seq(
-        from = Sys.Date() - 10,
-        by = "days",
-        length.out = 5
-      ),
-      10,
-      replace = T
-    ),
-    分类    = sample(x = c('A', 'B'), 10 , replace = T))
+    发病日期 = sample(seq(from = Sys.Date() - 10, by = "days", length.out = 5), 10, replace = T),
+    分类     = sample(x = c('A', 'B'), 10 , replace = T)
+    )
+  # DF$发病日期 <- gsub("/0", "/", format(DF$发病日期, "%Y/%m/%d"))
   rhandsontable(DF, language = 'zh-CN') %>%
-    hot_context_menu(allowColEdit = FALSE, allowRowEdit = TRUE)
+    hot_context_menu(allowColEdit = FALSE, allowRowEdit = TRUE) |>
+    hot_col("发病日期",
+            # dateFormat = "YYYY/MM/DD",
+            # type = "date",
+            language = 'zh-CN')
 })
 
 output$data_input <- renderRHandsontable({
   DF <- data.frame(
-    发病日期    = seq(
-      from = Sys.Date() - 20,
-      by = "days",
-      length.out = 15
-    ),
-    数量    = sample(
-      x = 1:10,
-      size = 15,
-      replace = TRUE
-    ),
-    分类    = sample(x = c('A', 'B'), 15 , replace = T)
-  )
-  rhandsontable(DF) %>%
+    发病日期 = seq(from = Sys.Date() - 20, by = "days", length.out = 15),
+    数量     = sample(x = 1:10, size = 15, replace = TRUE),
+    分类     = sample(x = c('A', 'B'), 15 , replace = T)
+    )
+  # DF$发病日期 <- gsub("/0", "/", format(DF$发病日期, "%Y/%m/%d"))
+  rhandsontable(DF, language = 'zh-CN') %>%
     hot_context_menu(allowColEdit = FALSE, allowRowEdit = TRUE) |>
     hot_col("发病日期",
-            dateFormat = "YYYY/MM/DD",
-            type = "date",
+            # dateFormat = "YYYY/MM/DD",
+            # type = "date",
             language = 'zh-CN')
 })
+
+# Confirmed trans data ----------------------------------------------------
 
 observeEvent(input$trans_raw, {
   DF <- hot_to_r(input$data_raw)
@@ -95,20 +120,21 @@ observeEvent(input$trans_raw, {
   output$data_input <- renderRHandsontable({
     DF <- datafile[, c('onset', 'X', 'type')]
     names(DF) <- c('发病日期', '数量', '分类')
-    rhandsontable(DF) %>%
-      hot_context_menu(allowColEdit = FALSE, allowRowEdit = TRUE) |>
-      hot_col("发病日期",
-              dateFormat = "YYYY/MM/DD",
-              type = "date",
-              language = 'zh-CN')
+    # DF$发病日期 <- gsub("/0", "/", format(DF$发病日期, "%Y/%m/%d"))
+    rhandsontable(DF, language = 'zh-CN') %>%
+      hot_context_menu(allowColEdit = FALSE, allowRowEdit = TRUE)
   })
 })
+
+# Confirmed input data ----------------------------------------------------
 
 observeEvent(input$trans_input, {
   DF <- hot_to_r(input$data_input)
   ## date modify
   names(DF) = c('t', 'X', 'type')
+  # browser()
   df <- DF %>%
+    mutate(t = as.Date(t)) %>%
     arrange(t) %>%
     drop_na() %>%
     filter(t >= min(DF[DF$X > 0, 1], na.rm = T)) %>%
@@ -195,6 +221,8 @@ observeEvent(input$trans_input, {
     fig
   })
 })
+
+# Download epicurve -------------------------------------------------------
 
 observeEvent(input$Epicurve_download, {
   if (!is.null(values$df_plot)) {
