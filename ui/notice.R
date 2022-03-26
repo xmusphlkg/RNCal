@@ -8,17 +8,14 @@ tab_notice <- tabPanelBody(value = 'Notice',
                              box(
                                title = '使用须知',
                                width = 8,
+                               height = '650px',
                                includeMarkdown('ui/aggrement.md'),
-                               br(),
-                               column(
-                                 width = 12,
-                                 align = 'right',
-                                 actionBttn(
-                                   inputId = 'Tab_dataload',
-                                   label = '同意并开始数据导入',
-                                   icon = icon('check'),
-                                   color = 'success'
-                                 )
+                               div(actionBttn(
+                                 inputId = 'Tab_dataload',
+                                 label = '同意并开始数据导入',
+                                 icon = icon('check'),
+                                 color = 'success'
+                               ),
+                               style = "position:absolute;right:25px; bottom:25px;")
                                )
-                             )
                            )))

@@ -3,25 +3,26 @@
 
 observeEvent(input$input_rawdata, {
   file <- input$input_rawdata
-  DF <- tryCatch({
-    DF <- read.xlsx(file$datapath)
-    names(DF)[1] <- '发病日期'
-    DF$发病日期     <- convertToDate(DF$发病日期)
-    if (ncol(DF) == 1) {
-      DF$分类     <- 'A'
-    } else {
-      names(DF)[2] <- '分类'
-    }
-    DF
-  },
-  warning = function(warn) {
-    showNotification(paste0(warn), type = 'warning')
-    DF
-  },
-  error = function(err) {
-    showNotification(paste0(err), type = 'err')
-  }
-  )
+  withCallingHandlers(
+    tryCatch({
+      DF <- read.xlsx(file$datapath)
+      names(DF)[1] <- '发病日期'
+      DF$发病日期     <- convertToDate(DF$发病日期)
+      if (ncol(DF) == 1) {
+        DF$分类     <- 'A'
+      } else {
+        names(DF)[2] <- '分类'
+      }
+    },
+    error = function(err) {
+      showNotification(paste0(err), type = 'err')
+      DF <- NA
+    }),
+    warning = function(warn) {
+      showNotification(paste0(warn), type = 'warning')
+      invokeRestart("muffleWarning")
+    })
+  
   output$data_raw <- renderRHandsontable({
     rhandsontable(DF, language = 'zh-CN') %>%
       hot_context_menu(allowColEdit = FALSE, allowRowEdit = TRUE) |>
@@ -36,25 +37,28 @@ observeEvent(input$input_rawdata, {
 
 observeEvent(input$input_transdata, {
   file <- input$input_transdata
-  DF <- tryCatch({
-    DF <- read.xlsx(file$datapath)
-    names(DF)[1:2] <- c('发病日期', '数量')
-    DF$发病日期     <- convertToDate(DF$发病日期)
-    DF$数量     <- as.numeric(DF$数量)
-    if (ncol(DF) == 2) {
-      DF$分类     <- 'A'
-    } else {
-      names(DF)[3] <- '分类'
-    }
-    DF
-  },
-  warning = function(warn) {
-    showNotification(paste0(warn), type = 'warning')
-    DF
-  },
-  error = function(err) {
-    showNotification(paste0(err), type = 'err')
-  })
+  withCallingHandlers(
+    tryCatch({
+      DF <- read.xlsx(file$datapath)
+      names(DF)[1:2] <- c('发病日期', '数量')
+      DF$发病日期     <- convertToDate(DF$发病日期)
+      DF$数量     <- as.numeric(DF$数量)
+      if (ncol(DF) == 2) {
+        DF$分类     <- 'A'
+      } else {
+        names(DF)[3] <- '分类'
+      }
+      DF
+    },
+    error = function(err) {
+      showNotification(paste0(err), type = 'err')
+      DF <- NA
+    }),
+    warning = function(warn) {
+      showNotification(paste0(warn), type = 'warning')
+      invokeRestart("muffleWarning")
+    })
+  
   output$data_input <- renderRHandsontable({
     rhandsontable(DF, language = 'zh-CN') %>%
       hot_context_menu(allowColEdit = FALSE, allowRowEdit = TRUE) |>
