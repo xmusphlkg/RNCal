@@ -63,7 +63,7 @@ data_input <- tabPanelBody(
         column(width = 4,
                actionBttn(
                  inputId = 'Epicurve_download',
-                 label = '结果下载',
+                 label = '下载',
                  color = 'warning',
                  icon = icon("download"),
                )),
