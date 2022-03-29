@@ -32,15 +32,15 @@ fluidPage(
         top = "center",
         size = 24,
         css = ""
-      )
-      # includeHTML('ui/googleanalytics.html')
+      ),
+      includeHTML('ui/googleanalytics.html')
     ),
     tabPanel(title = 'Notice', tab_notice, value = 'Notice'),
     tabPanel(title = '关于',
              fluidPage(column(width = 12,
                               offset = 2,
                               box(width = 8,
-                                  includeMarkdown('README.md')))
+                                  includeMarkinitdown('README.md')))
                        )
              )
   ),
