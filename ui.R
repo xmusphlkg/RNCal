@@ -40,7 +40,7 @@ fluidPage(
              fluidPage(column(width = 12,
                               offset = 2,
                               box(width = 8,
-                                  includeMarkinitdown('README.md')))
+                                  includeMarkdown('README.md')))
                        )
              )
   ),

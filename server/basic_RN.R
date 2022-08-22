@@ -140,7 +140,7 @@ observeEvent(input$R0_gt_data_confirmed_1, {
     if (length(df) != 0) {
       df_gt <- suppressMessages(suppressWarnings(
         generation.time(
-          type = input$R0_gt_data_gt_type,
+          type = input$R0_gt_data_gt_type_1,
           val = as.numeric(df)
         )
       ))

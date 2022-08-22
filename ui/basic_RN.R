@@ -11,7 +11,7 @@ basic_RN <- tabPanelBody(
         inputId = "select_packages_R0",
         label = "选择估计方法 (Packages)",
         choices = c('EarlyR', 'R0'),
-        selected = 'EarlyR',
+        selected = 'R0',
         options = list(style = "btn-danger")
       ),
       # actionBttn(
@@ -115,7 +115,7 @@ basic_RN <- tabPanelBody(
                                    "详细数据" = "detail",
                                    "Generation Time" = "GT"
                                  ),
-                                 selected = 'SI'
+                                 selected = 'GT'
                                )
                              ),
                              div(column(
@@ -204,11 +204,11 @@ basic_RN <- tabPanelBody(
                              ),
                              column(
                                width = 4,
-                               textAreaInput(
+                               textInput(
                                  inputId = 'R0_gt_data_gt_content_1',
                                  label = 'values(使用半角的 , 分割)',
-                                 width = '100%',
-                                 height = '200px'
+                                 width = '100%'
+                                 # height = '200px'
                                )
                              )
                              

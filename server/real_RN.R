@@ -13,6 +13,30 @@ observeEvent(input$epiestim_parametric_si_data, {
                        label = '代间距(SI)均数',
                        value = 2.3)
   }
+  if (input$epiestim_parametric_si_data == "Delta_湖南") {
+    updateNumericInput(inputId = 'epiestim_parametric_si_std',
+                       label = '代间距(SI)标准差',
+                       value = 5.7)
+    updateNumericInput(inputId = 'epiestim_parametric_si_mean',
+                       label = '代间距(SI)均数',
+                       value = 4.45)
+  }
+  if (input$epiestim_parametric_si_data == "Omicron_BA1_珠海") {
+    updateNumericInput(inputId = 'epiestim_parametric_si_std',
+                       label = '代间距(SI)标准差',
+                       value = 2.06)
+    updateNumericInput(inputId = 'epiestim_parametric_si_mean',
+                       label = '代间距(SI)均数',
+                       value = 3)
+  }
+  if (input$epiestim_parametric_si_data == "Omicron_BA2_厦门") {
+    updateNumericInput(inputId = 'epiestim_parametric_si_std',
+                       label = '代间距(SI)标准差',
+                       value = 1.26)
+    updateNumericInput(inputId = 'epiestim_parametric_si_mean',
+                       label = '代间距(SI)均数',
+                       value = 2.24)
+  }
 })
 
 # parametric_si -----------------------------------------------------------

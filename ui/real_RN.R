@@ -48,17 +48,16 @@ real_RN <- tabPanelBody(
                                                       inputId = 'epiestim_parametric_si_data',
                                                       label = '默认数据',
                                                       choices = c("Delta_广东", 
-                                                                  "Delta_01", 
-                                                                  "Delta_02", 
-                                                                  "Delta_03",
-                                                                  "Delta_04"),
-                                                      selected = 'Delta_广东'
+                                                                  "Delta_湖南", 
+                                                                  "Omicron_BA1_珠海", 
+                                                                  "Omicron_BA2_厦门"),
+                                                      selected = 'Omicron_BA2_厦门'
                                                     ),
                                                     numericInput(
                                                       inputId = 'epiestim_parametric_si_std',
                                                       label = '代间距(SI)标准差',
                                                       width = '100%',
-                                                      value = 3.4
+                                                      value = 1.26
                                                     ),
                                                     pickerInput(
                                                       inputId = 'epiestim_parametric_si_first',
@@ -79,7 +78,7 @@ real_RN <- tabPanelBody(
                                                       inputId = 'epiestim_parametric_si_mean',
                                                       label = '代间距(SI)均数',
                                                       width = '100%',
-                                                      value = 2.3
+                                                      value = 2.24
                                                     ),
                                                     div(
                                                       column(
