@@ -6,9 +6,7 @@ tab_notice <- tabPanelBody(value = 'Notice',
                              width = 12,
                              offset = 2,
                              box(
-                               title = '使用须知',
                                width = 8,
-                               height = '650px',
                                includeMarkdown('ui/aggrement.md'),
                                div(actionBttn(
                                  inputId = 'Tab_dataload',
