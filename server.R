@@ -4,7 +4,8 @@ function(input, output, session) {
     df_plot = NULL,
     R0_gt = NULL,
     df_Rt = NULL,
-    date_breaks = NULL
+    date_breaks = NULL,
+    epiestim_config = NULL
   )
   figs <- reactiveValues(
     fig_epicurve = NULL,

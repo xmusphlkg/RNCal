@@ -13,6 +13,8 @@ library(extrafont)
 library(RColorBrewer)
 library(shinydisconnect)
 
+library(shinyAce)
+
 # suppressWarnings(font_import(paths = './fonts/', pattern = "Times", prompt = F))
 
 library(incidence)
@@ -23,4 +25,4 @@ library(EpiEstim)
 
 data("H1N1.serial.interval")
 data("MockRotavirus")
-linelist <- readRDS('data/linelist_cleaned.rds')
+linelist <- readRDS("data/linelist_cleaned.rds")

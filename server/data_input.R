@@ -25,7 +25,7 @@ observeEvent(input$input_rawdata, {
   
   output$data_raw <- renderRHandsontable({
     rhandsontable(DF, language = 'zh-CN') %>%
-      hot_context_menu(allowColEdit = FALSE, allowRowEdit = TRUE) |>
+      hot_context_menu(allowColEdit = FALSE, allowRowEdit = TRUE) %>%
       hot_col("发病日期",
               # dateFormat = "YYYY/MM/DD",
               # type = "date",
@@ -61,7 +61,7 @@ observeEvent(input$input_transdata, {
   
   output$data_input <- renderRHandsontable({
     rhandsontable(DF, language = 'zh-CN') %>%
-      hot_context_menu(allowColEdit = FALSE, allowRowEdit = TRUE) |>
+      hot_context_menu(allowColEdit = FALSE, allowRowEdit = TRUE) %>%
       hot_col("发病日期",
               # dateFormat = "YYYY/MM/DD",
               # type = "date",
@@ -188,7 +188,7 @@ observeEvent(input$trans_input, {
     return(fxn)
   }
   
-  fig <- ggplot(data = datafile) +          # set data
+  fig <- ggplot(data = datafile) +
     geom_histogram(
       # add histogram
       mapping = aes(x = onset,
@@ -197,7 +197,7 @@ observeEvent(input$trans_input, {
       # map date column to x-axis
       binwidth = 1,
       color = 'white'
-    ) +                     # cases binned by 1 day
+    ) +  
     scale_x_date(
       expand = c(0, 0),
       limits = c(min(df$t) - 3, max(df$t) + date_add),
@@ -220,9 +220,21 @@ observeEvent(input$trans_input, {
   }
   
   figs$fig_epicurve <- fig
-  
-  output$data_preview <- renderPlot({
-    fig
+  print("Epicurve updated").
+
+  withCallingHandlers({
+    output$data_preview <- renderPlot({
+      fig
+    })
+  },
+  warning = function(warn) {
+    shinyalert(
+      "Warning",
+      paste(warn),
+      timer = 5000,
+      type = "warning",
+      size = "xs"
+    )
   })
 })
 
