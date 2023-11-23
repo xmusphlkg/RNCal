@@ -65,6 +65,27 @@ observeEvent(input$earlyR_si_confirmed, {
     output$fig_earlyR_R0 <- renderPlot({
       fig
     })
+
+    # 生成计算代码
+    code_to_display <- paste0(
+      "# 安装包\n",
+      "# install.packages('earlyR')\n",
+      "library(earlyR)\n\n",
+      "# 设置代际时间\n",
+      "si_mean <- ", deparse(si_mean), "\n",
+      "si_sd <- ", deparse(si_sd), "\n\n",
+      "# 设置病例数据\n",
+      "val <- incidence(as.Date(", deparse1(as.character(datafile$onset)), "))\n\n",
+      "# 估计R0\n",
+      "outcome <- get_R(val, si_mean = si_mean, si_sd = si_sd)\n",
+      "plot(outcome)"
+    )
+    # 更新计算代码
+    updateAceEditor(
+      session,
+      "code_editor",
+      value = code_to_display,
+    )
   }
 })
 
@@ -225,12 +246,46 @@ observeEvent(input$R0_R0_confirmed, {
       })
 
       # 生成计算代码
+      code_val <- switch(input$R0_gt_input_type_1,
+        "SI" = {
+          df <- hot_to_r(input$R0_gt_data_si_1)
+          df <- df[rep(row.names(df), df$Freq), 1]
+          paste0("est.GT(serial.interval = ", deparse(as.numeric(df)), ")")
+        },
+        "detail" = {
+          df <- hot_to_r(input$R0_gt_data_detail_1)
+          paste0("est.GT(infector.onset.dates = ", deparse(df$传染者发病时间), ", infectee.onset.dates = ", deparse(df$感染者发病时间), ")")
+        },
+        "GT" = {
+          df <- switch(input$R0_gt_data_gt_type_1,
+            "empirical" = as.numeric(
+              hot_to_r(input$R0_gt_data_gt_empirical_1)[, 1]
+            ),
+            "gamma" = c(
+              input$R0_gt_data_gt_gamma_shape,
+              input$R0_gt_data_gt_gamma_scale
+            ),
+            "weibull" = c(
+              input$R0_gt_data_gt_weibull_shape,
+              input$R0_gt_data_gt_weibull_scale
+            ),
+            "lognormal" = c(
+              input$R0_gt_data_gt_lognormal_meanlog,
+              input$R0_gt_data_gt_lognormal_sdlog
+            ),
+            stop("未知的GT类型", call. = FALSE)
+          )
+          paste0("generation.time(type = '", input$R0_gt_data_gt_type_1, "', val = ", deparse(df), ")")
+        },
+        stop("未知的输入类型", call. = FALSE)
+      )
+
       code_to_display <- paste0(
-        "# 还在修改中", "\n\n",
+        "# 安装R0包\n",
+        "# install.packages('R0')\n",
+        "library(R0)\n\n",
         "# 设置代际时间\n",
-        "type <-", input$R0_gt_input_type_1, "\n",
-        "val <- ", deparse(values$R0_gt), "\n",
-        "df_gt <- generation.time(type = type, val = val, step = step)\n\n",
+        "df_gt <- ", code_val, "\n\n",
         "# 设置病例数据\n",
         "df_value <- read.csv('test.csv', header = T)\n",
         "# 设置开始和结束时间\n",

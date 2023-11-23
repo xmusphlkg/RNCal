@@ -142,7 +142,7 @@ observeEvent(input$R0_Rt_confirmed, {
                  datafile
                },
                "SB" = {
-                 df_Rt <- est.R0.SB(data, gt, begin = start, end = stop, ...)
+                 df_Rt <- est.R0.SB(data, gt, begin = begin, end = end, ...)
                  # 更新UI
                  output$R0_est_Rt <- renderPrint(print(df_Rt))
                  datafile <- data.frame(
@@ -214,17 +214,51 @@ observeEvent(input$R0_Rt_confirmed, {
       })
       
       # 生成计算代码
+      code_val <- switch(input$R0_gt_input_type_2,
+               "SI" = {
+                 df <- hot_to_r(input$R0_gt_data_si_2)
+                 df <- df[rep(row.names(df), df$Freq), 1]
+                 paste0("est.GT(serial.interval = ", deparse(as.numeric(df)), ")")
+               },
+               "detail" = {
+                 df <- hot_to_r(input$R0_gt_data_detail_2)
+                 paste0("est.GT(infector.onset.dates = ", deparse(df$传染者发病时间), ", infectee.onset.dates = ", deparse(df$感染者发病时间), ")")
+               },
+               "GT" = {
+                 df <- switch(input$R0_gt_data_gt_type_3,
+                              "empirical" = as.numeric(
+                                hot_to_r(input$R0_gt_data_gt_empirical_2)[, 1]
+                              ),
+                              "gamma" = c(
+                                input$R0_gt_data_gt_gamma_shape_1,
+                                input$R0_gt_data_gt_gamma_scale_1
+                              ),
+                              "weibull" = c(
+                                input$R0_gt_data_gt_weibull_shape_1,
+                                input$R0_gt_data_gt_weibull_scale_1
+                              ),
+                              "lognormal" = c(
+                                input$R0_gt_data_gt_lognormal_meanlog_1,
+                                input$R0_gt_data_gt_lognormal_sdlog_1
+                              ),
+                              stop("未知的GT类型", call. = FALSE)
+                 )
+                 paste0("generation.time(type = '", input$R0_gt_data_gt_type_3, "', val = ", deparse(df), ")")
+               },
+               stop("未知的输入类型", call. = FALSE)
+        )
+
       code_to_display <- paste0(
-        "# 还在修改中", "\n\n",
+        "# 安装R0包\n",
+        "# install.packages('R0')\n",
+        "library(R0)\n\n",
         "# 设置代际时间\n",
-        "type <-", input$R0_gt_input_type_2, "\n",
-        "val <- ", deparse(values$R0_gt), "\n",
-        "df_gt <- generation.time(type = type, val = val, step = step)\n\n",
+        "df_gt <- ", code_val, "\n\n",
         "# 设置病例数据\n",
         "df_value <- read.csv('test.csv', header = T)\n",
         "# 设置开始和结束时间\n",
-        "begin <- ", deparse(begin), "\n",
-        "end <- ", deparse(end), "\n\n",
+        "begin <- ", begin, "\n",
+        "end <- ", end, "\n\n",
         "# 估计R0\n",
         "df_R0 <- est.R0.", input$R0_Rt_est_function, "(df_value, df_gt, begin = begin, end = end)"
       )
@@ -520,14 +554,50 @@ observeEvent(input$rt_epiestim_confirmed, {
     
     
     # 更新计算代码
+    code_val <- switch(input$epiestim_method,
+             "non_parametric_si" = {
+               si_distr <- hot_to_r(input$non_parametric_si_data)
+               paste0(
+                "si_distr <- read.csv('si.csv')\n",
+                'names(si_distr) <- c("n", "freq")\n',
+                "si_distr <- si_distr |>\n", 
+                "  complete(\n",
+                "    n = seq(min(n), max(n)),\n",
+                "    fill = list(freq = 0)\n",
+                "  ) |>\n",
+                "  mutate(freq = freq / sum(freq))\n",
+                "config_lit <- make_config(list(si_distr = c(0, si_distr$freq),\n  t_start = ", deparse1(start_dates), ",\n  t_end = ", deparse1(end_dates), "))"
+                )
+             },
+             "parametric_si" = {
+               mean_si <- input$epiestim_parametric_si_mean
+               std_si <- input$epiestim_parametric_si_std
+               paste0("make_config(list(mean_si = ", mean_si, ",\n  std_si = ", std_si, ",\n  t_start = ", deparse1(start_dates), ",\n  t_end = ", deparse1(end_dates), "))")
+             },
+             'uncertain_si' ={
+               mean_si <- input$epiestim_uncertain_si_mean_si
+               std_mean_si <- input$epiestim_uncertain_si_std_mean_si
+               min_mean_si <- input$epiestim_uncertain_si_min_mean_si
+               max_mean_si <- input$epiestim_uncertain_si_max_mean_si
+               std_si <- input$epiestim_uncertain_si_std_si
+               std_std_si <- input$epiestim_uncertain_si_std_std_si
+               min_std_si <- input$epiestim_uncertain_si_min_std_si
+               max_std_si <- input$epiestim_uncertain_si_max_std_si
+               n1 <- input$epiestim_uncertain_si_n1
+               n2 <- input$epiestim_uncertain_si_n2
+               paste0("make_config(list(t_start = ", deparse1(start_dates), ",\n  t_end = ", deparse1(end_dates), ",\n  mean_si = ", mean_si, ",\n  std_mean_si = ", std_mean_si, ",\n  min_mean_si = ", min_mean_si, ",\n  max_mean_si = ", max_mean_si, ",\n  std_si = ", std_si, ",\n  std_std_si = ", std_std_si, ",\n  min_std_si = ", min_std_si, ",\n  max_std_si = ", max_std_si, ",\n  n1 = ", n1, ",\n  n2 = ", n2, ")")
+             },
+             stop("未知的输入类型", call. = FALSE)
+      )
+
     code_to_display <- paste0(
       "# 还在修改中", "\n\n",
       "# 配置文件\n",
-      "config_lit <-make_config(method = ", input$epiestim_method, "...)\n\n",
+      "config_lit <- ", code_val, "\n\n",
       "# 设置病例数据\n",
       "df_value <- read.csv('test.csv', header = T)\n",
       "# 估计Rt\n",
-      "df_Rt <- estimate_R(df_value, ", input$epiestim_method, ", config = config_lit)"
+      "df_Rt <- estimate_R(df_value, method = '", input$epiestim_method, "', config = config_lit)"
     )
     
     # 更新计算代码

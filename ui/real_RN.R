@@ -32,8 +32,7 @@ real_RN <- tabPanelBody(
           label = "转到R0计算",
           style = "float",
           icon = icon("toggle-off"),
-          color = "success",
-          width = "100%"
+          color = "success"
         )
       ),
       style = "top: 25px;position: relative;"
