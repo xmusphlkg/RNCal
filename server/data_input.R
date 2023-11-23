@@ -220,7 +220,7 @@ observeEvent(input$trans_input, {
   }
   
   figs$fig_epicurve <- fig
-  print("Epicurve updated").
+  print("Epicurve updated")
 
   withCallingHandlers({
     output$data_preview <- renderPlot({
