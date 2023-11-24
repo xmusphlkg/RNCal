@@ -3,34 +3,56 @@
 
 observeEvent(input$input_rawdata, {
   file <- input$input_rawdata
+  
   withCallingHandlers(
     tryCatch({
-      DF <- read.xlsx(file$datapath)
-      names(DF)[1] <- '发病日期'
-      DF$发病日期     <- convertToDate(DF$发病日期)
+      DF <- read.xlsx(file$datapath, detectDates = TRUE)
+      
+      # 验证数据的完整性
       if (ncol(DF) == 1) {
-        DF$分类     <- 'A'
-      } else {
+        names(DF)[1] <- '发病日期'
+        DF$分类     <- 'Unset'
+      } else if (ncol(DF) >= 2) {
+        names(DF)[1] <- '发病日期'
         names(DF)[2] <- '分类'
+      } else {
+        stop("数据框列数不正确, 应该为两列(发病日期，分类)或者一列（发病日期）")
       }
+
+      # 验证日期格式
+      if (any(is.na(DF$发病日期))) {
+        stop("发病日期列中存在缺失值")
+      }
+      if (!is.Date(DF$发病日期)) {
+        stop("发病日期列中存在非日期格式")
+      }
+
+      # 读取数据
+      output$data_raw <- renderRHandsontable({
+        if (is.na(DF)) {
+          rhandsontable(data.frame(), language = 'zh-CN')
+        } else {
+          rhandsontable(DF, language = 'zh-CN') %>%
+            hot_context_menu(allowColEdit = FALSE, allowRowEdit = TRUE) %>%
+            hot_col("发病日期", language = 'zh-CN')
+        }
+      })
     },
     error = function(err) {
-      showNotification(paste0(err), type = 'err')
+      shinyalert(
+        "提交失败",
+        paste("原因：", err$message),
+        timer = 5000,
+        type = "error",
+        size = "xs"
+      )
       DF <- NA
-    }),
+    },
     warning = function(warn) {
       showNotification(paste0(warn), type = 'warning')
       invokeRestart("muffleWarning")
     })
-  
-  output$data_raw <- renderRHandsontable({
-    rhandsontable(DF, language = 'zh-CN') %>%
-      hot_context_menu(allowColEdit = FALSE, allowRowEdit = TRUE) %>%
-      hot_col("发病日期",
-              # dateFormat = "YYYY/MM/DD",
-              # type = "date",
-              language = 'zh-CN')
-  })
+  )
 })
 
 # Reading upload trans data -----------------------------------------------
@@ -39,16 +61,46 @@ observeEvent(input$input_transdata, {
   file <- input$input_transdata
   withCallingHandlers(
     tryCatch({
-      DF <- read.xlsx(file$datapath)
-      names(DF)[1:2] <- c('发病日期', '数量')
-      DF$发病日期     <- convertToDate(DF$发病日期)
-      DF$数量     <- as.numeric(DF$数量)
+      DF <- read.xlsx(file$datapath, detectDates = T)
+
+      # 验证数据的完整性
       if (ncol(DF) == 2) {
-        DF$分类     <- 'A'
-      } else {
+        names(DF)[1] <- '发病日期'
+        names(DF)[2] <- '数量'
+        DF$分类     <- 'Unset'
+      } else if (ncol(DF) >= 3) {
+        names(DF)[1] <- '发病日期'
+        names(DF)[2] <- '数量'
         names(DF)[3] <- '分类'
+      } else {
+        stop(paste0("数据框列数不正确, 应该为三列(发病日期，数量，分类)或者两列（发病日期，数量）.\n您输入了", ncol(DF), "列"))
       }
-      DF
+
+      # 验证日期格式
+      if (any(is.na(DF$发病日期))) {
+        stop("发病日期列中存在缺失值")
+      }
+      if (!is.Date(DF$发病日期)) {
+        stop("发病日期列中存在非日期格式")
+      }
+
+      # 验证数量格式
+      if (any(is.na(DF$数量))) {
+        stop("数量列中存在缺失值")
+      }
+      if (!is.numeric(DF$数量)) {
+        stop("数量列中存在非数值格式")
+      }
+
+      # 读取数据
+      output$data_input <- renderRHandsontable({
+        rhandsontable(DF, language = 'zh-CN') %>%
+          hot_context_menu(allowColEdit = FALSE, allowRowEdit = TRUE) %>%
+          hot_col("发病日期",
+                  # dateFormat = "YYYY/MM/DD",
+                  # type = "date",
+                  language = 'zh-CN')
+      })
     },
     error = function(err) {
       showNotification(paste0(err), type = 'err')
@@ -58,15 +110,6 @@ observeEvent(input$input_transdata, {
       showNotification(paste0(warn), type = 'warning')
       invokeRestart("muffleWarning")
     })
-  
-  output$data_input <- renderRHandsontable({
-    rhandsontable(DF, language = 'zh-CN') %>%
-      hot_context_menu(allowColEdit = FALSE, allowRowEdit = TRUE) %>%
-      hot_col("发病日期",
-              # dateFormat = "YYYY/MM/DD",
-              # type = "date",
-              language = 'zh-CN')
-  })
 })
 
 # Example input data ------------------------------------------------------

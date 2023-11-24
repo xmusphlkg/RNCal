@@ -197,9 +197,7 @@ observeEvent(input$R0_Rt_confirmed, {
           fontface = "bold"
         ) +
         scale_x_date(
-          expand = c(0, 0),
-          date_labels = "%m/%d",
-          date_breaks = date_breaks
+          expand = c(0, 0)
         ) +
         scale_y_continuous(expand = c(0, 0)) +
         labs(x = "", y = expression(R[t])) +
@@ -533,9 +531,7 @@ observeEvent(input$rt_epiestim_confirmed, {
         fontface = "bold"
       ) +
       scale_x_date(
-        expand = c(0, 0),
-        date_labels = "%m/%d",
-        date_breaks = date_breaks
+        expand = c(0, 0)
       ) +
       scale_y_continuous(
         expand = expansion(mult = c(0, 0.1)),
