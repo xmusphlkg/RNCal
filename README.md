@@ -1,6 +1,10 @@
-# RNCal
+## Introduction
 
-A shinyapp to calculate reproductive number
+A shinyapp to calculate reproductive number. The project has been published in China CDC Weekly (doi: 10.46234/ccdcw2023.158), and we encourage you to cite this project if you find it useful for your work.
+
+用于计算再生数的交互式网页，项目工作已经发表在 China CDC Weekly 上 (doi: 10.46234/ccdcw2023.158)，如果本项目对你的工作有帮助欢迎引此项目。
+
+> Kangguo Li, Jiayi Wang, Jiayuan Xie, Jia Rui, Buasiyamu Abudunaibi, Hongjie Wei, Hong Liu, Shuo Zhang, Qun Li, Yan Niu, Tianmu Chen. Advancements in Defining and Estimating the Reproduction Number in Infectious Disease Epidemiology[J]. China CDC Weekly, 2023, 5(37): 829-834. doi: 10.46234/ccdcw2023.158
 
 ## Who are you？
 
@@ -56,7 +60,7 @@ A shinyapp to calculate reproductive number
 
 > **V2.0.2 2023/11/24**
 
-> 增加代码生成和docker container位置显示，增加示例文件下载。
+> 增加代码生成和 docker container 位置显示，增加示例文件下载。
 
 ## Cite
 
