@@ -62,6 +62,10 @@ A shinyapp to calculate reproductive number. The project has been published in C
 
 > 增加代码生成和 docker container 位置显示，增加示例文件下载。
 
+> **V2.0.3 2023/11/29**
+
+> 修复代码生成错误。
+
 ## Cite
 
 如果我们对您的科研工作有所帮助，亦或是您希望能够引用我们的产品和前人的工作。
