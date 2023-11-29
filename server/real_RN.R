@@ -197,7 +197,8 @@ observeEvent(input$R0_Rt_confirmed, {
           fontface = "bold"
         ) +
         scale_x_date(
-          expand = c(0, 0)
+          expand = c(0, 0),
+          date_labels = "%m/%d"
         ) +
         scale_y_continuous(expand = c(0, 0)) +
         labs(x = "", y = expression(R[t])) +
@@ -254,6 +255,10 @@ observeEvent(input$R0_Rt_confirmed, {
         "df_gt <- ", code_val, "\n\n",
         "# 设置病例数据\n",
         "df_value <- read.csv('test.csv', header = T)\n",
+        "names(df_value) = c('t', 'X')\n",
+        "df_value <- df_value |>
+        complete(t = seq.Date(min(t), max(t), by = 'day'),
+        fill = list(X = 0))\n",
         "# 设置开始和结束时间\n",
         "begin <- ", begin, "\n",
         "end <- ", end, "\n\n",
@@ -287,8 +292,8 @@ values$R0_gt <- NULL
 
 output$non_parametric_si_data <- renderRHandsontable({
   DF <- data.frame(
-    天数 = 1:12,
-    频数 = sample(1:5, size = 12, replace = T)
+    天数 = 0:10,
+    频数 = sample(1:5, size = 11, replace = T)
   )
   rhandsontable(DF, language = "zh-CN") |> 
     hot_context_menu(allowColEdit = FALSE, allowRowEdit = TRUE)
@@ -376,13 +381,13 @@ observeEvent(input$rt_epiestim_gt_confirmed, {
                names(si_distr) <- c("n", "freq")
                si_distr <- si_distr |>
                  complete(
-                   n = seq(min(n), max(n)),
+                   n = seq(0, max(n)),
                    fill = list(freq = 0)
                  ) |>
                  mutate(freq = freq / sum(freq))
                
                make_config(list(
-                 si_distr = c(0, as.numeric(si_distr$freq)),
+                 si_distr = as.numeric(si_distr$freq),
                  t_start = start_dates,
                  t_end = end_dates
                ))          
@@ -531,7 +536,8 @@ observeEvent(input$rt_epiestim_confirmed, {
         fontface = "bold"
       ) +
       scale_x_date(
-        expand = c(0, 0)
+        expand = c(0, 0),
+        date_labels = "%m/%d"
       ) +
       scale_y_continuous(
         expand = expansion(mult = c(0, 0.1)),
@@ -558,7 +564,7 @@ observeEvent(input$rt_epiestim_confirmed, {
                 'names(si_distr) <- c("n", "freq")\n',
                 "si_distr <- si_distr |>\n", 
                 "  complete(\n",
-                "    n = seq(min(n), max(n)),\n",
+                "    n = seq(0, max(n)),\n",
                 "    fill = list(freq = 0)\n",
                 "  ) |>\n",
                 "  mutate(freq = freq / sum(freq))\n",
@@ -568,7 +574,7 @@ observeEvent(input$rt_epiestim_confirmed, {
              "parametric_si" = {
                mean_si <- input$epiestim_parametric_si_mean
                std_si <- input$epiestim_parametric_si_std
-               paste0("make_config(list(mean_si = ", mean_si, ",\n  std_si = ", std_si, ",\n  t_start = ", deparse1(start_dates), ",\n  t_end = ", deparse1(end_dates), "))")
+               paste0("config_lit <- make_config(list(mean_si = ", mean_si, ",\n  std_si = ", std_si, ",\n  t_start = ", deparse1(start_dates), ",\n  t_end = ", deparse1(end_dates), "))")
              },
              'uncertain_si' ={
                mean_si <- input$epiestim_uncertain_si_mean_si
@@ -581,7 +587,7 @@ observeEvent(input$rt_epiestim_confirmed, {
                max_std_si <- input$epiestim_uncertain_si_max_std_si
                n1 <- input$epiestim_uncertain_si_n1
                n2 <- input$epiestim_uncertain_si_n2
-               paste0("make_config(list(t_start = ", deparse1(start_dates), ",\n  t_end = ", deparse1(end_dates), ",\n  mean_si = ", mean_si, ",\n  std_mean_si = ", std_mean_si, ",\n  min_mean_si = ", min_mean_si, ",\n  max_mean_si = ", max_mean_si, ",\n  std_si = ", std_si, ",\n  std_std_si = ", std_std_si, ",\n  min_std_si = ", min_std_si, ",\n  max_std_si = ", max_std_si, ",\n  n1 = ", n1, ",\n  n2 = ", n2, ")")
+               paste0("config_lit <- make_config(list(t_start = ", deparse1(start_dates), ",\n  t_end = ", deparse1(end_dates), ",\n  mean_si = ", mean_si, ",\n  std_mean_si = ", std_mean_si, ",\n  min_mean_si = ", min_mean_si, ",\n  max_mean_si = ", max_mean_si, ",\n  std_si = ", std_si, ",\n  std_std_si = ", std_std_si, ",\n  min_std_si = ", min_std_si, ",\n  max_std_si = ", max_std_si, ",\n  n1 = ", n1, ",\n  n2 = ", n2, ")")
              },
              stop("未知的输入类型", call. = FALSE)
       )
@@ -589,9 +595,13 @@ observeEvent(input$rt_epiestim_confirmed, {
     code_to_display <- paste0(
       "# 还在修改中", "\n\n",
       "# 配置文件\n",
-      "config_lit <- ", code_val, "\n\n",
+      code_val, "\n\n",
       "# 设置病例数据\n",
       "df_value <- read.csv('test.csv', header = T)\n",
+      "names(df_value) <- c('dates', 'I')\n",
+      "df_value <- df_value |>
+  complete(dates = seq.Date(min(dates), max(dates), by = 'day'),
+           fill = list(I = 0))\n\n",
       "# 估计Rt\n",
       "df_Rt <- estimate_R(df_value, method = '", input$epiestim_method, "', config = config_lit)"
     )

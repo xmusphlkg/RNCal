@@ -288,6 +288,11 @@ observeEvent(input$R0_R0_confirmed, {
         "df_gt <- ", code_val, "\n\n",
         "# 设置病例数据\n",
         "df_value <- read.csv('test.csv', header = T)\n",
+        "df_value <- read.csv('test.csv', header = T)\n",
+        "names(df_value) = c('t', 'X')\n",
+        "df_value <- df_value |>
+        complete(t = seq.Date(min(t), max(t), by = 'day'),
+        fill = list(X = 0))",
         "# 设置开始和结束时间\n",
         "begin <- ", deparse(begin), "\n",
         "end <- ", deparse(end), "\n\n",

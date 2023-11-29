@@ -50,9 +50,13 @@ A shinyapp to calculate reproductive number
 
 > 增加提示。
 
-> **V2.0.0 2023/11/23**
+> **V2.0.1 2023/11/23**
 
 > 重构 UI，修复多个已知问题。
+
+> **V2.0.2 2023/11/24**
+
+> 增加代码生成和docker container位置显示，增加示例文件下载。
 
 ## Cite
 
