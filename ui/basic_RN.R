@@ -191,7 +191,9 @@ basic_RN <- tabPanelBody(
                   rHandsontableOutput(
                     "R0_gt_data_gt_empirical_1",
                     height = "250px"
-                  )
+                  ),
+                  tags$br(),
+                  tags$span("注：此处默认数据为随机生成，不具备任何参考价值。")
                 )
               ),
               ## setting parameters input of gamma
@@ -240,6 +242,10 @@ basic_RN <- tabPanelBody(
                     min = 0.5,
                     width = "100%"
                   )
+                ),
+                column(
+                  width = 12,
+                  tags$span("注：此处默认数据为随机生成，不具备任何参考价值。")
                 )
               ),
               ## setting parameters input of lognormal
@@ -264,6 +270,10 @@ basic_RN <- tabPanelBody(
                     min = 0.5,
                     width = "100%"
                   )
+                ),
+                column(
+                  width = 12,
+                  tags$span("注：此处默认数据为随机生成，不具备任何参考价值。")
                 )
               )
             )
@@ -285,15 +295,15 @@ basic_RN <- tabPanelBody(
           status = "danger",
           width = 12,
           verbatimTextOutput("R0_gt_data_1", placeholder = T),
-        column(
-          width = 12,
-          actionButton(
-            inputId = "R0_R0_confirmed",
-            label = "估计R0",
-            icon = icon("toggle-off"),
-            width = "100%",
+          column(
+            width = 12,
+            actionButton(
+              inputId = "R0_R0_confirmed",
+              label = "估计R0",
+              icon = icon("toggle-off"),
+              width = "100%",
+            )
           )
-        )
         )
       )
     )

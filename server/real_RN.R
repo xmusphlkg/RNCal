@@ -292,8 +292,8 @@ values$R0_gt <- NULL
 
 output$non_parametric_si_data <- renderRHandsontable({
   DF <- data.frame(
-    天数 = 0:10,
-    频数 = sample(1:5, size = 11, replace = T)
+    天数 = 1:10,
+    频数 = sample(1:5, size = 10, replace = T)
   )
   rhandsontable(DF, language = "zh-CN") |> 
     hot_context_menu(allowColEdit = FALSE, allowRowEdit = TRUE)

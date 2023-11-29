@@ -120,8 +120,9 @@ real_RN <- tabPanelBody(
           condition = 'input.epiestim_method == "non_parametric_si"',
           column(
             width = 12,
-            rHandsontableOutput("non_parametric_si_data", height = "400px"),
-            tags$br()
+            rHandsontableOutput("non_parametric_si_data", height = "250px"),
+            tags$br(),
+            tags$span("注：此处默认数据为随机生成，不具备任何参考价值。")
           )
         ),
         conditionalPanel(
@@ -191,6 +192,10 @@ real_RN <- tabPanelBody(
               width = "100%",
               value = 100
             )
+          ),
+          column(
+            width = 12,
+            tags$span("注：此处默认数据为随机生成，不具备任何参考价值。")
           )
         ),
         tags$br(),
@@ -318,6 +323,10 @@ real_RN <- tabPanelBody(
                   "R0_gt_data_gt_empirical_2",
                   height = "250px"
                 )
+              ),
+              column(
+                width = 12,
+                tags$span("注：此处默认数据为随机生成，不具备任何参考价值。")
               )
             ),
             ## setting parameters input of gamma
@@ -366,6 +375,10 @@ real_RN <- tabPanelBody(
                   min = 0.5,
                   width = "100%"
                 )
+              ),
+              column(
+                width = 12,
+                tags$span("注：此处默认数据为随机生成，不具备任何参考价值。")
               )
             ),
             ## setting parameters input of lognormal
@@ -390,6 +403,10 @@ real_RN <- tabPanelBody(
                   min = 0.5,
                   width = "100%"
                 )
+              ),
+              column(
+                width = 12,
+                tags$span("注：此处默认数据为随机生成，不具备任何参考价值。")
               )
             )
           )
