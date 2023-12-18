@@ -89,6 +89,10 @@ A shinyapp to calculate reproductive number. The project has been published in C
 
 > 修复代码生成错误。
 
+> **V2.0.4 2023/12/18**
+
+> 修复代码生成错误，增加制图年份显示。
+
 ## Cite
 
 如果我们对您的科研工作有所帮助，亦或是您希望能够引用我们的产品和前人的工作。

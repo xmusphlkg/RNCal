@@ -198,7 +198,7 @@ observeEvent(input$R0_Rt_confirmed, {
         ) +
         scale_x_date(
           expand = c(0, 0),
-          date_labels = "%m/%d"
+          date_labels = "%m/%d\n%Y"
         ) +
         scale_y_continuous(expand = c(0, 0)) +
         labs(x = "", y = expression(R[t])) +
@@ -249,8 +249,8 @@ observeEvent(input$R0_Rt_confirmed, {
 
       code_to_display <- paste0(
         "# 安装R0包\n",
-        "# install.packages('R0')\n",
-        "library(R0)\n\n",
+        "# install.packages(c('R0', 'tidyr'))\n",
+        "library(R0);library(tidyr)\n\n",
         "# 设置代际时间\n",
         "df_gt <- ", code_val, "\n\n",
         "# 设置病例数据\n",
@@ -259,6 +259,9 @@ observeEvent(input$R0_Rt_confirmed, {
         "df_value <- df_value |>
         complete(t = seq.Date(min(t), max(t), by = 'day'),
         fill = list(X = 0))\n",
+        "# 整理数据\n",
+        "values = df_value$X\n",
+        "names(values) <- df_value$t\n",
         "# 设置开始和结束时间\n",
         "begin <- ", begin, "\n",
         "end <- ", end, "\n\n",
@@ -537,7 +540,7 @@ observeEvent(input$rt_epiestim_confirmed, {
       ) +
       scale_x_date(
         expand = c(0, 0),
-        date_labels = "%m/%d"
+        date_labels = "%m/%d\n%Y"
       ) +
       scale_y_continuous(
         expand = expansion(mult = c(0, 0.1)),
@@ -560,6 +563,9 @@ observeEvent(input$rt_epiestim_confirmed, {
              "non_parametric_si" = {
                si_distr <- hot_to_r(input$non_parametric_si_data)
                paste0(
+                "# 安装EpiEstim包\n",
+                "# install.packages('EpiEstim')\n",
+                "# install.packages(c('EpiEstim', 'tidyr'))\n",
                 "si_distr <- read.csv('si.csv')\n",
                 'names(si_distr) <- c("n", "freq")\n',
                 "si_distr <- si_distr |>\n", 
@@ -574,7 +580,11 @@ observeEvent(input$rt_epiestim_confirmed, {
              "parametric_si" = {
                mean_si <- input$epiestim_parametric_si_mean
                std_si <- input$epiestim_parametric_si_std
-               paste0("config_lit <- make_config(list(mean_si = ", mean_si, ",\n  std_si = ", std_si, ",\n  t_start = ", deparse1(start_dates), ",\n  t_end = ", deparse1(end_dates), "))")
+               paste0(
+                "# 安装EpiEstim包\n",
+                "# install.packages(c('EpiEstim', 'tidyr'))\n",
+                "library(EpiEstim);library(tidyr)\n\n",
+                "config_lit <- make_config(list(mean_si = ", mean_si, ",\n  std_si = ", std_si, ",\n  t_start = ", deparse1(start_dates), ",\n  t_end = ", deparse1(end_dates), "))")
              },
              'uncertain_si' ={
                mean_si <- input$epiestim_uncertain_si_mean_si
@@ -587,7 +597,11 @@ observeEvent(input$rt_epiestim_confirmed, {
                max_std_si <- input$epiestim_uncertain_si_max_std_si
                n1 <- input$epiestim_uncertain_si_n1
                n2 <- input$epiestim_uncertain_si_n2
-               paste0("config_lit <- make_config(list(t_start = ", deparse1(start_dates), ",\n  t_end = ", deparse1(end_dates), ",\n  mean_si = ", mean_si, ",\n  std_mean_si = ", std_mean_si, ",\n  min_mean_si = ", min_mean_si, ",\n  max_mean_si = ", max_mean_si, ",\n  std_si = ", std_si, ",\n  std_std_si = ", std_std_si, ",\n  min_std_si = ", min_std_si, ",\n  max_std_si = ", max_std_si, ",\n  n1 = ", n1, ",\n  n2 = ", n2, ")")
+               paste0(
+                "# 安装EpiEstim包\n",
+                "# install.packages(c('EpiEstim', 'tidyr'))\n",
+                "library(EpiEstim);library(tidyr)\n\n",
+                "config_lit <- make_config(list(t_start = ", deparse1(start_dates), ",\n  t_end = ", deparse1(end_dates), ",\n  mean_si = ", mean_si, ",\n  std_mean_si = ", std_mean_si, ",\n  min_mean_si = ", min_mean_si, ",\n  max_mean_si = ", max_mean_si, ",\n  std_si = ", std_si, ",\n  std_std_si = ", std_std_si, ",\n  min_std_si = ", min_std_si, ",\n  max_std_si = ", max_std_si, ",\n  n1 = ", n1, ",\n  n2 = ", n2, ")")
              },
              stop("未知的输入类型", call. = FALSE)
       )

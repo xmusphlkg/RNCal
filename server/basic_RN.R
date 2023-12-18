@@ -282,8 +282,8 @@ observeEvent(input$R0_R0_confirmed, {
 
       code_to_display <- paste0(
         "# 安装R0包\n",
-        "# install.packages('R0')\n",
-        "library(R0)\n\n",
+        "# install.packages(c('R0', 'tidyr'))\n",
+        "library(R0);library(tidyr)\n\n",
         "# 设置代际时间\n",
         "df_gt <- ", code_val, "\n\n",
         "# 设置病例数据\n",
@@ -292,6 +292,9 @@ observeEvent(input$R0_R0_confirmed, {
         "df_value <- df_value |>
         complete(t = seq.Date(min(t), max(t), by = 'day'),
         fill = list(X = 0))",
+        "# 整理数据\n",
+        "values = df_value$X\n",
+        "names(values) <- df_value$t\n",
         "# 设置开始和结束时间\n",
         "begin <- ", deparse(begin), "\n",
         "end <- ", deparse(end), "\n\n",
